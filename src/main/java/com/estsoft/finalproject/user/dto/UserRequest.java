@@ -12,5 +12,4 @@ public class UserRequest {
     private String provider;
     private String email;
     private String nickname;
-
 }

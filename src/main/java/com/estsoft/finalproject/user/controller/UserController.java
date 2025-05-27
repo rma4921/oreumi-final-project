@@ -3,6 +3,7 @@ package com.estsoft.finalproject.user.controller;
 import com.estsoft.finalproject.user.dto.UserRequest;
 import com.estsoft.finalproject.user.dto.UserResponse;
 import com.estsoft.finalproject.user.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserResponse login(@RequestBody UserRequest userRequest) {
-        return userService.loginOrRegister(userRequest);
+    public ResponseEntity<UserResponse> login(@RequestBody UserRequest userRequest) {
+        UserResponse response = userService.loginOrRegister(userRequest);
+        return ResponseEntity.ok(response);
     }
 }
