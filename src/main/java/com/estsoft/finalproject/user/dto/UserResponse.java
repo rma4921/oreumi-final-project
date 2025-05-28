@@ -15,7 +15,7 @@ public class UserResponse {
     private String provider;
     private String email;
     private String nickname;
-    private Role role;
+    private String role;
     private LocalDateTime registerDate;
     private LocalDateTime updatedDate;
 
@@ -24,7 +24,7 @@ public class UserResponse {
         this.provider = user.getProvider();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
-        this.role = user.getRole();
+        this.role = user.getRole().name();
         this.registerDate = user.getRegisterDate();
         this.updatedDate = user.getUpdatedDate();
     }
