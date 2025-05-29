@@ -77,6 +77,7 @@ public class AlanCommunicationService {
         String translateQuery = new StringBuilder("다음 주제와 관련된 주식에 대한 정보 찾아줘. (최대 ").append(numberOfRelatedCompanies).append("개) : \"")
             .append(topic)
             .append("\"")
+            .append(" 상장되지 않았거나, 정보를 찾을 수 없는 회사는 생략해도 돼. ")
             .append(" 답변은 다음 형식으로 해줘: \"")
             .append("[{ \"company\" : (회사명), \"stock_price\" : (현재 주가) }]").toString();
         return getResultFromAlan(translateQuery);
@@ -85,6 +86,7 @@ public class AlanCommunicationService {
     public AlanResponseDto summarizeArticle(String articleUrl) {
         String translateQuery = new StringBuilder("이 URL에 있는 기사 자세히 요약해줘: ")
             .append(articleUrl)
+            .append(" 만약 회사가 언급되었으면, 어떤 회사가 언급되었는지 주제에 명시해 줘. ")
             .append(" 답변은 다음 형식으로 해줘: \"")
             .append("{ \"headline\" : (제목), \"content\" : (요약), topic : (주제) }").toString();
         return getResultFromAlan(translateQuery);
