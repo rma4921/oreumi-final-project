@@ -15,7 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import com.estsoft.finalproject.content.model.dto.AlanResponseDto;
+import com.estsoft.finalproject.content.model.dto.NewsDetailItem;
+import com.estsoft.finalproject.content.model.dto.ResponseDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -69,9 +73,45 @@ public class AlanCommunicationService {
         return getResultFromAlan(translateQuery);
     }
 
-    public AlanResponseDto findRelatedStock(String company) {
-        String translateQuery = new StringBuilder("다음 회사와 관련된 주식 찾아줘: \"").append(company).append("\"").toString();
+    public AlanResponseDto findRelatedStock(String topic, int numberOfRelatedCompanies) {
+        String translateQuery = new StringBuilder("다음 주제와 관련된 주식에 대한 정보 찾아줘. (최대 ").append(numberOfRelatedCompanies).append("개) : \"")
+            .append(topic)
+            .append("\"")
+            .append(" 답변은 다음 형식으로 해줘: \"")
+            .append("[{ \"company\" : (회사명), \"stock_price\" : (현재 주가) }]").toString();
         return getResultFromAlan(translateQuery);
+    }
+
+    public AlanResponseDto summarizeArticle(String articleUrl) {
+        String translateQuery = new StringBuilder("이 URL에 있는 기사 자세히 요약해줘: ")
+            .append(articleUrl)
+            .append(" 답변은 다음 형식으로 해줘: \"")
+            .append("{ \"headline\" : (제목), \"content\" : (요약), topic : (주제) }").toString();
+        return getResultFromAlan(translateQuery);
+    }
+
+    public ResponseDto<NewsDetailItem> getNewsDetails(String articleUrl) {
+        AlanResponseDto newsSearchItem = summarizeArticle(articleUrl);
+        if (newsSearchItem.getResponseCode() != HttpStatus.OK) {
+            NewsDetailItem ret = NewsDetailItem.builder().headline("Invalid response due to an error").content("").timestamp(newsSearchItem.getTimestamp()).topic("").link(articleUrl).build();
+            return ResponseDto.builder(ret).message("Invalid response due to an error").responseCode(newsSearchItem.getResponseCode()).build();
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonRead = mapper.readTree(newsSearchItem.getContent());
+            String headline = Optional.ofNullable(jsonRead.get("headline")).map(x -> x.asText("null")).orElse("null");
+            String content = Optional.ofNullable(jsonRead.get("content")).map(x -> x.asText("null")).orElse("null");
+            String topic = Optional.ofNullable(jsonRead.get("topic")).map(x -> x.asText("null")).orElse("null");
+            if (headline.equalsIgnoreCase("null") || content.equalsIgnoreCase("null") || topic.equalsIgnoreCase("null")) {
+                NewsDetailItem ret = NewsDetailItem.builder().headline("Malformed JSON. Failed to parse!").content(newsSearchItem.getContent()).timestamp(newsSearchItem.getTimestamp()).topic("").link(articleUrl).build();
+                return ResponseDto.builder(ret).message("Invalid response due to an error").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            NewsDetailItem ret = NewsDetailItem.builder().headline(headline).content(content).topic(topic).timestamp(newsSearchItem.getTimestamp()).link(articleUrl).build();
+            return ResponseDto.builder(ret).message("Successfully summarized the article with details.").responseCode(HttpStatus.OK).build();
+        } catch (JsonProcessingException jex) {
+            NewsDetailItem ret = NewsDetailItem.builder().headline("Malformed JSON. Failed to parse!").content(newsSearchItem.getContent()).timestamp(newsSearchItem.getTimestamp()).topic("").link(articleUrl).build();
+            return ResponseDto.builder(ret).message("Invalid response due to an error").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }
