@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>마이 페이지</title>
+    <link href="/css/mypage/mypage.css" rel="stylesheet">
+</head>
+<body>
+<form action="/mypage" method="get" class="search-form">
+    <input name="keyword" type="text" placeholder="제목으로 검색"
+           th:value="${keyword} ?: ''" class="search-input"/>
+    <button type="submit" class="search-button">검색</button>
+</form>
+
+<div class="container">
+    <h3 class="section-title">스크랩한 게시글</h3>
+    <div th:each="item : ${scrappedArticle}">
+        <div class="post-item">
+            <h5><a th:href="@{/mypage/scrap/{id}(id=${item.scrapId})}"
+                   th:text="${item.title}"></a>
+            </h5>
+            <div class="post-topic">
+                핵심 요약: <span th:text="${item.topic}"></span>
+            </div>
+            <div class="post-date">
+                스크랩 날짜: <span th:text="${#temporals.format(item.scrapDate, 'yyyy-MM-dd HH:mm')}"></span>
+            </div>
+        </div>
+    </div>
+
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:if="${hasPrevBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${startPage - 1})}">«</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${i})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:if="${hasNextBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${endPage + 1})}">»</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>
