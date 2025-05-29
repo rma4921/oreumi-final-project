@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>상세 보기</title>
+    <link href="/css/mypage/detail.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="title-row">
+        <h3 class="article-title" th:text="${scrappedArticle.title}">기사 제목</h3>
+
+        <form th:if="${!scrappedArticle.isShared()}"
+              th:action="@{'/api/mypage/' + ${scrappedArticle.scrapId}}"
+              method="post" onsubmit="return confirm('정말 공유하시겠습니까?')">
+            <button type="submit" class="share-button">게시글 공유</button>
+        </form>
+
+        <a class="move-button"
+           th:if="${scrappedArticle.isShared()}"
+           th:href="@{'#' + ${scrappedArticle.scrapId}}"> <!--여기는 나중에 URL 확정되면 그때 수정하는 걸로-->
+            게시글 이동
+        </a>
+
+        <form th:action="@{'/api/mypage/' + ${scrappedArticle.scrapId}}"
+              method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+            <input type="hidden" name="_method" value="delete"/>
+            <button type="submit" class="delete-button">삭제하기</button>
+        </form>
+    </div>
+
+    <div class="info">
+        <strong>스크랩한 날짜:</strong>
+        <span th:text="${#temporals.format(scrappedArticle.scrapDate, 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
+
+    <div class="info">
+        <strong>URL:</strong>
+        <a th:href="${scrappedArticle.link}" target="_blank" th:text="${scrappedArticle.link}"></a>
+    </div>
+
+    <div class="info">
+        <strong>기사 발행일:</strong>
+        <span th:text="${#temporals.format(scrappedArticle.pubDate, 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
+
+    <div class="description" th:text="${scrappedArticle.description}"></div>
+
+    <div class="info">
+        <strong>핵심 요약:</strong>
+        <span th:text="${scrappedArticle.topic}"></span>
+    </div>
+
+    <div class="related-stock-title">관련주식</div>
+    <div class="stock-buttons">
+        <th:block th:each="stock : ${relatedStocks}">
+            <button class="stock-button" th:text="${stock.name}"></button>
+        </th:block>
+    </div>
+</div>
+</body>
+</html>
