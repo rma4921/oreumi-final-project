@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.estsoft.finalproject.content.model.dto.AlanResponseDto;
+import com.estsoft.finalproject.content.prompting.SimpleAlanKoreanPromptBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -96,5 +98,45 @@ public class AlanCommunicationServiceTest {
         logger.info("Summary is: " + content);
         logger.info("Topic is: " + topic);
         logger.info("Related stocks are: " + res2.getContent());
+    }
+
+    @Test
+    public void testSimpleAlanPromptBuilder() {
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilder()");
+        AlanResponseDto res = alanCommunicationService.getResultFromAlan(SimpleAlanKoreanPromptBuilder.start().
+            addCommand("다음 기사 요약해줘: https://www.donga.com/news/Politics/article/all/20250526/131671484/2")
+            .setOutputFormat("{ \"title\" : (기사 제목), \"summary\" : (요약문) }")
+            .addErrorHandler("다음과 같이 결과를 출력해줘: { \"title\" : \"오류\", \"summary\" : (오류 발생 이유) }")
+            .buildPrompt());
+        Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
+        logger.info("Response is: " + res.getContent());
+    }
+
+    @Test
+    public void testSimpleAlanPromptBuilderWithContext() {
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilder()");
+        AlanResponseDto res = alanCommunicationService.getResultFromAlan(SimpleAlanKoreanPromptBuilder.start()
+            .addCommand("맛집 5곳 추천해줘")
+            .addContext("수원시 인계동에 있는 곳. 종류는 한식으로.")
+            .setOutputFormat("[{ \"name\" : (이름), \"address\" : (주소) }]")
+            .addErrorHandler("다음과 같이 결과를 출력해줘: [{ \"name\" : \"찾을 수 없음\", \"address\" : (찾을 수 없었던 이유) }]")
+            .buildPrompt());
+        Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
+        logger.info("Response is: " + res.getContent());
+    }
+
+    @Test
+    public void testWrongPromptBuilder() throws JsonProcessingException {
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilder()");
+        AlanResponseDto res = alanCommunicationService.getResultFromAlan(SimpleAlanKoreanPromptBuilder.start().
+            addCommand("다음 기사 요약해줘: https://www.donga.com/newssdfsdfsdf/Politisdfsdfsdfcs/article/all/20250526/131671484/2")
+            .setOutputFormat("{ \"title\" : (기사 제목), \"summary\" : (요약문) }")
+            .addErrorHandler("다음과 같이 결과를 출력해줘: { \"title\" : \"오류\", \"summary\" : (오류 발생 이유) }")
+            .buildPrompt());
+        Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
+        logger.info("Response is: " + res.getContent());
+        ObjectMapper mapper = new ObjectMapper();
+        String errorTitle = mapper.readTree(res.getContent()).get("title").asText();
+        Assertions.assertThat(errorTitle).isEqualTo("오류");
     }
 }
