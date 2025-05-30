@@ -22,4 +22,14 @@ public class User {
     @Column(nullable = false, length = 200)
     private String nickname;
 
+    // 테스트 코드용
+    public void updateId(Long id) {
+        this.id = id;
+    }
+
+    // 테스트 코드용
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
 }
