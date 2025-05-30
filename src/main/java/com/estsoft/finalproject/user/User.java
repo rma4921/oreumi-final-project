@@ -10,7 +10,7 @@ import lombok.Getter;
 
 // 동엽님이랑 맞춰봐야 함.
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 public class User {
 
