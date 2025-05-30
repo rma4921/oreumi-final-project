@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class UserViewController {
+public class UsersViewController {
     // 로그인 테스트용
     @GetMapping("/custom-login")
     public String loginPage() {

@@ -1,21 +1,25 @@
 package com.estsoft.finalproject.user.config;
 
-import com.estsoft.finalproject.user.service.CustomOAuth2UserService;
+import com.estsoft.finalproject.user.jwt.JwtAuthenticationFilter;
+import com.estsoft.finalproject.user.jwt.OAuth2LoginSuccessHandler;
+import com.estsoft.finalproject.user.service.CustomOAuth2UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2UsersService customOAuth2UsersService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
@@ -25,9 +29,9 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/custom-login") // 나중에 login으로 변경
-                        .defaultSuccessUrl("/loginSuccessTest", true)
+                        .successHandler(oAuth2LoginSuccessHandler)
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
+                                .userService(customOAuth2UsersService)
                         )
                         // 로그인 실패 에러 추적
                         .failureHandler((request, response, exception) -> {
@@ -35,6 +39,8 @@ public class SecurityConfig {
                             response.sendRedirect("/login?error");
                         })
                 );
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

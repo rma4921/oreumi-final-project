@@ -1,8 +1,8 @@
 package com.estsoft.finalproject.user.service;
 
 import com.estsoft.finalproject.user.domain.Role;
-import com.estsoft.finalproject.user.domain.User;
-import com.estsoft.finalproject.user.repository.UserRepository;
+import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    private final UserRepository userRepository;
+public class CustomOAuth2UsersService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+    private final UsersRepository usersRepository;
 
     @Override
     @Transactional
@@ -65,15 +65,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             default -> throw new OAuth2AuthenticationException("Unknown provider: " + provider);
         }
 
-        Optional<User> optionalUser = userRepository.findByProviderAndEmail(provider, email);
+        Optional<Users> optionalUser = usersRepository.findByProviderAndEmail(provider, email);
 
-        User user = optionalUser.orElseGet(() -> {
-            User newUser = new User(provider, email, nickname, Role.ROLE_USER);
-            return userRepository.save(newUser);
+        Users users = optionalUser.orElseGet(() -> {
+            Users newUsers = new Users(provider, email, nickname, Role.ROLE_USER);
+            return usersRepository.save(newUsers);
         });
 
         return new DefaultOAuth2User(
-                List.of(new SimpleGrantedAuthority(user.getRole().name())),
+                List.of(new SimpleGrantedAuthority(users.getRole().name())),
                 userAttributes,  // response 객체를 직접 attribute로 사용
                 "email"          // userAttributes 안의 키 중 로그인 식별자로 사용할 것
         );

@@ -18,7 +18,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -44,7 +44,7 @@ public class User {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    public User(String provider, String email, String nickname, Role role) {
+    public Users(String provider, String email, String nickname, Role role) {
         this.provider = provider;
         this.email = email;
         this.nickname = nickname;
