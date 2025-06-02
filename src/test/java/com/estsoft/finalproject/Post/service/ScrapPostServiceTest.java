@@ -10,6 +10,7 @@ import com.estsoft.finalproject.user.User;
 import com.estsoft.finalproject.user.UserRepository;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,13 +55,14 @@ class ScrapPostServiceTest {
     }
 
     @Test
+    @DisplayName("게시글 저장 테스트")
     void savePost() {
         scrapPostService.savePost(article.getScrapId());
 
         assertThat(scrapPostRepository
             .existsByScrappedArticle_ScrapId(article.getScrapId())).isTrue();
         assertThatThrownBy(() -> scrapPostService.savePost(article.getScrapId()))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("이미 게시된 스크랩 기사입니다.");
         assertThatThrownBy(() -> scrapPostService.savePost(999L))
             .isInstanceOf(IllegalArgumentException.class)
