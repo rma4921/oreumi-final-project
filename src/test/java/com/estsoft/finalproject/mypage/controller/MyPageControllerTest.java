@@ -63,7 +63,7 @@ class MyPageControllerTest {
 
     @Test
     @DisplayName("메인 페이지 기본 화면 테스트")
-    public void testGetScrappedArticles_NoKeyWord() throws Exception {
+    public void getScrappedArticles_NoKeyWord() throws Exception {
         List<ScrappedArticleResponseDto> article = List.of(
             new ScrappedArticleResponseDto(1L, "Test 중입니다.", "test", LocalDateTime.now())
         );
@@ -87,7 +87,7 @@ class MyPageControllerTest {
 
     @Test
     @DisplayName("메인 페이지 검색 화면 테스트")
-    public void testGetScrappedArticles_WithKeyWord() throws Exception {
+    public void getScrappedArticles_WithKeyWord() throws Exception {
         List<ScrappedArticleResponseDto> articles = List.of(
             new ScrappedArticleResponseDto(1L, "Test 중입니다.", "test", LocalDateTime.now())
         );
@@ -111,7 +111,7 @@ class MyPageControllerTest {
 
     @Test
     @DisplayName("게시글 상세 보기 테스트")
-    public void testGetScrappedArticleDetail() throws Exception {
+    public void getScrappedArticleDetail() throws Exception {
         ScrappedArticleDetailResponseDto article =
             new ScrappedArticleDetailResponseDto(
                 1L, "Test 중입니다.", "test", LocalDateTime.now(),
