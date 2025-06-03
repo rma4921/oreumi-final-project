@@ -28,6 +28,21 @@
             font-size: 18px;
             margin: 6px 0;
         }
+        .logout-button {
+            margin-top: 30px;
+        }
+        .logout-button button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout-button button:hover {
+            background-color: #c0392b;
+        }
     </style>
 </head>
 <body>
@@ -36,6 +51,10 @@
     <h1>✅ 로그인 성공!</h1>
     <div class="users-info" id="users-info">
         사용자 정보를 불러오는 중입니다...
+    </div>
+
+    <div class="logout-button">
+        <button onclick="handleLogout()">로그아웃</button>
     </div>
 </div>
 
@@ -61,6 +80,18 @@
         .catch(error => {
             document.getElementById('users-info').innerHTML = `<p style="color:red;">${error.message}</p>`;
         });
+
+    // 로그아웃 처리
+    function handleLogout() {
+        fetch('/logout', {
+            method: 'POST',
+            credentials: 'include'
+        }).then(() => {
+            window.location.href = '/custom-login';  // 로그아웃 후 로그인 페이지로 이동
+        }).catch(() => {
+            alert('로그아웃 실패');
+        });
+    }
 </script>
 
 </body>
