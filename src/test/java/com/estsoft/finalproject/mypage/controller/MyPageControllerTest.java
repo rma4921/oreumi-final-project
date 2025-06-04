@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.estsoft.finalproject.category.dto.CategoryResponseDto;
+import com.estsoft.finalproject.category.service.CategoryService;
 import com.estsoft.finalproject.mypage.dto.RelatedStockResponseDTO;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
@@ -28,6 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,6 +38,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @SpringBootTest
 @AutoConfigureMockMvc
 @WithMockUser
+@TestPropertySource(locations = "classpath:application-test.properties")
 class MyPageControllerTest {
 
     @Autowired
@@ -45,6 +49,9 @@ class MyPageControllerTest {
 
     @MockitoBean
     private RelatedStockService relatedStockService;
+
+    @MockitoBean
+    private CategoryService categoryService;
 
     // 동엽님 코드에 따라 수정해야 함.
     @BeforeEach
@@ -64,13 +71,17 @@ class MyPageControllerTest {
     @Test
     @DisplayName("메인 페이지 기본 화면 테스트")
     public void getScrappedArticles_NoKeyWord() throws Exception {
+        Long scrapId = 1L;
+
         List<ScrappedArticleResponseDto> article = List.of(
-            new ScrappedArticleResponseDto(1L, "Test 중입니다.", "test", LocalDateTime.now())
+            new ScrappedArticleResponseDto(scrapId, "Test 중입니다.", "test", LocalDateTime.now())
         );
         Page<ScrappedArticleResponseDto> page = new PageImpl<>(article, PageRequest.of(0, 10), 1);
 
         given(scrappedArticleService.getScrappedArticlesByUser(any(), any()))
             .willReturn(page);
+        given(categoryService.getCategoriesByScrapId(scrapId))
+            .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
 
         ResultActions resultActions = mockMvc.perform(get("/mypage")
             .param("scrapPage", "0")
@@ -81,20 +92,24 @@ class MyPageControllerTest {
             .andExpect(view().name("layout/mypage/mypage"))
             .andExpect(model().attributeExists(
                 "scrappedArticle", "totalPages", "currentPage",
-                "startPage", "endPage", "hasPrevBlock", "hasNextBlock", "keyword"
+                "startPage", "endPage", "hasPrevBlock",
+                "hasNextBlock", "keyword", "articlesCategory"
             ));
     }
 
     @Test
     @DisplayName("메인 페이지 검색 화면 테스트")
     public void getScrappedArticles_WithKeyWord() throws Exception {
+        Long scrapId = 1L;
         List<ScrappedArticleResponseDto> articles = List.of(
-            new ScrappedArticleResponseDto(1L, "Test 중입니다.", "test", LocalDateTime.now())
+            new ScrappedArticleResponseDto(scrapId, "Test 중입니다.", "test", LocalDateTime.now())
         );
         Page<ScrappedArticleResponseDto> page = new PageImpl<>(articles, PageRequest.of(0, 10), 1);
 
         given(scrappedArticleService.getScrappedArticlesByUserAndTitle(any(), any(), any()))
             .willReturn(page);
+        given(categoryService.getCategoriesByScrapId(scrapId))
+            .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
 
         ResultActions resultActions = mockMvc.perform(get("/mypage")
             .param("scrapPage", "0")
@@ -105,16 +120,19 @@ class MyPageControllerTest {
             .andExpect(view().name("layout/mypage/mypage"))
             .andExpect(model().attributeExists(
                 "scrappedArticle", "totalPages", "currentPage",
-                "startPage", "endPage", "hasPrevBlock", "hasNextBlock", "keyword"
+                "startPage", "endPage", "hasPrevBlock",
+                "hasNextBlock", "keyword", "articlesCategory"
             ));
     }
 
     @Test
     @DisplayName("게시글 상세 보기 테스트")
     public void getScrappedArticleDetail() throws Exception {
+        Long scrapId = 1L;
+
         ScrappedArticleDetailResponseDto article =
             new ScrappedArticleDetailResponseDto(
-                1L, "Test 중입니다.", "test", LocalDateTime.now(),
+                scrapId, "Test 중입니다.", "test", LocalDateTime.now(),
                 "요약", "https://www.naver.com", LocalDateTime.now(),
                 false
             );
@@ -128,11 +146,24 @@ class MyPageControllerTest {
             .willReturn(article);
         given(relatedStockService.findByScrapId(1L))
             .willReturn(stocks);
+        given(categoryService.getAllCategories())
+            .willReturn(List.of(new CategoryResponseDto("정치"),
+                new CategoryResponseDto("경제"),
+                new CategoryResponseDto("사회"),
+                new CategoryResponseDto("생활/문화"),
+                new CategoryResponseDto("IT/과학"),
+                new CategoryResponseDto("세계")
+            ));
+        given(categoryService.getCategoriesByScrapId(scrapId))
+            .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
 
         ResultActions resultActions = mockMvc.perform(get("/mypage/scrap/1"));
 
         resultActions.andExpect(status().isOk())
             .andExpect(view().name("layout/mypage/detail"))
-            .andExpect(model().attributeExists("scrappedArticle", "relatedStocks"));
+            .andExpect(model().attributeExists(
+                "scrappedArticle", "relatedStocks",
+                "categories", "checkedCategories"
+            ));
     }
 }
