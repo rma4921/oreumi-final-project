@@ -19,11 +19,17 @@
             <h5><a th:href="@{/mypage/scrap/{id}(id=${item.scrapId})}"
                    th:text="${item.title}"></a>
             </h5>
+            <div class="post-category">
+                카테고리: <span
+                th:each="categoryName : ${articlesCategory[item.scrapId]}"
+                th:text="${categoryName} + ' '"></span>
+            </div>
             <div class="post-topic">
                 핵심 요약: <span th:text="${item.topic}"></span>
             </div>
             <div class="post-date">
-                스크랩 날짜: <span th:text="${#temporals.format(item.scrapDate, 'yyyy-MM-dd HH:mm')}"></span>
+                스크랩 날짜: <span
+                th:text="${#temporals.format(item.scrapDate, 'yyyy-MM-dd HH:mm')}"></span>
             </div>
         </div>
     </div>

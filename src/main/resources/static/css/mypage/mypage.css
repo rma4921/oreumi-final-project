@@ -66,6 +66,7 @@ body {
     text-decoration: underline;
 }
 
+.post-category,
 .post-topic,
 .post-date {
     font-size: 13px;
