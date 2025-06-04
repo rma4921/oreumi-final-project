@@ -66,11 +66,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (jwt == null) {
-            // JWT 토큰 없으면 401 반환
+            // JWT 토큰 없으면 로그인 페이지로 리디렉션
             log.info("JWT 토큰이 없습니다.");
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized: JWT token is missing");
+            redirectToLogin(response);
             return;
         }
 
@@ -94,12 +93,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.info("JWT 인증 실패: {}", e.getMessage());
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized: " + e.getMessage());
+            redirectToLogin(response);
             return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void redirectToLogin(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/custom-login");
     }
 
 }
