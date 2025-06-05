@@ -21,20 +21,32 @@ public class CategoryService {
     private final ScrappedArticleRepository scrappedArticleRepository;
 
     @Transactional
-    public void updateTags(Long scrapId, List<String> categories) {
+    public void updateCategories(Long scrapId, List<String> categories) {
         ScrappedArticle article = scrappedArticleRepository.findById(scrapId)
             .orElseThrow(() -> new IllegalArgumentException("해당하는 스크랩 기사가 없습니다."));
 
-        scrappedArticleCategoryRepository.deleteByScrappedArticle(article);
+        List<ScrappedArticleCategory> currentCategories = scrappedArticleCategoryRepository
+            .findByScrappedArticle(article);
+        List<String> currentNames = currentCategories.stream()
+            .map(category -> category.getCategory().getCategoryName())
+            .toList();
+
+        for (ScrappedArticleCategory scrappedArticleCategory : currentCategories) {
+            if (!categories.contains(scrappedArticleCategory.getCategory().getCategoryName())) {
+                scrappedArticleCategoryRepository.delete(scrappedArticleCategory);
+            }
+        }
 
         for (String categoryName : categories) {
-            Category category = categoryRepository.findByCategoryName(categoryName)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 태그가 없습니다."));
-            scrappedArticleCategoryRepository.save(ScrappedArticleCategory.builder()
-                .scrappedArticle(article)
-                .category(category)
-                .build()
-            );
+            if (!currentNames.contains(categoryName)) {
+                Category category = categoryRepository.findByCategoryName(categoryName)
+                    .orElseThrow(() -> new IllegalArgumentException("해당하는 태그가 없습니다."));
+                scrappedArticleCategoryRepository.save(ScrappedArticleCategory.builder()
+                    .scrappedArticle(article)
+                    .category(category)
+                    .build()
+                );
+            }
         }
     }
 
@@ -48,7 +60,8 @@ public class CategoryService {
     }
 
     public List<CategoryResponseDto> getCategoriesByScrapId(Long scrapId) {
-        List<Category> categories = scrappedArticleCategoryRepository.findCategoriesByScrapId(scrapId);
+        List<Category> categories = scrappedArticleCategoryRepository.findCategoriesByScrapId(
+            scrapId);
 
         return categories.stream()
             .map(category -> CategoryResponseDto.builder()
