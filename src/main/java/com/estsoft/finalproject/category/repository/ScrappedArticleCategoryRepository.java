@@ -18,4 +18,6 @@ public interface ScrappedArticleCategoryRepository extends JpaRepository<Scrappe
         WHERE sac.scrappedArticle.scrapId = :scrapId
         """)
     List<Category> findCategoriesByScrapId(@Param("scrapId") Long scrapId);
+
+    List<ScrappedArticleCategory> findByScrappedArticle(ScrappedArticle article);
 }
