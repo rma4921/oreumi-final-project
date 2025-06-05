@@ -20,7 +20,7 @@ public class CategoryController {
         @RequestParam(required = false) List<String> categoryNames,
         Model model) {
 
-        categoryService.updateTags(scrapId, categoryNames != null ? categoryNames : List.of());
+        categoryService.updateCategories(scrapId, categoryNames != null ? categoryNames : List.of());
 
         model.addAttribute("checkedCategory", categoryNames);
         return "redirect:/mypage/scrap/" + scrapId;
