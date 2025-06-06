@@ -1,7 +1,9 @@
 package com.estsoft.finalproject.Post.controller;
 
 import com.estsoft.finalproject.Post.service.ScrapPostService;
+import com.estsoft.finalproject.security.UserDetail;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +15,10 @@ public class ScrapPostController {
     private final ScrapPostService scrapPostService;
 
     @PostMapping("/api/mypage/{scrapId}")
-    public String saveScrapPost(@PathVariable Long scrapId) {
-        scrapPostService.savePost(scrapId);
+    public String saveScrapPost(@PathVariable Long scrapId,
+        @AuthenticationPrincipal UserDetail userDetail) {
+
+        scrapPostService.savePost(scrapId, userDetail.getUser());
 
         return "redirect:/mypage/scrap/" + scrapId;
     }
