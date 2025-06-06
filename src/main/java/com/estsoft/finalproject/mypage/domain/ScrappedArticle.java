@@ -62,4 +62,8 @@ public class ScrappedArticle {
         return new ScrappedArticleResponseDto(scrapId, title, topic, scrapDate);
     }
 
+    public void updateScrapId(Long scrapId) {
+        this.scrapId = scrapId;
+    }
+
 }

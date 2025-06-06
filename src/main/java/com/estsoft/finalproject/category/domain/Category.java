@@ -18,12 +18,16 @@ import lombok.NoArgsConstructor;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int categoryId;
+    private Long categoryId;
 
     @Column(nullable = false, unique = true)
     private String categoryName;
 
     public Category(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public void updateCategoryId(Long id) {
+        categoryId = id;
     }
 }
