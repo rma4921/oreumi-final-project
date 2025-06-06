@@ -1,33 +1,26 @@
 package com.estsoft.finalproject.mypage.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.estsoft.finalproject.mypage.service.ScrappedArticleService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
 class ScrappedArticleControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockitoBean
+    @Mock
     private ScrappedArticleService scrappedArticleService;
+
+    @InjectMocks
+    private ScrappedArticleController scrappedArticleController;
 
     @Test
     @DisplayName("스크랩한 게시글 삭제 테스트")
@@ -35,11 +28,9 @@ class ScrappedArticleControllerTest {
         Long scrapId = 1L;
         doNothing().when(scrappedArticleService).deleteScrappedArticle(scrapId);
 
-        ResultActions resultActions = mockMvc.perform(delete("/api/mypage/1"));
+        String viewName = scrappedArticleController.deleteScrappedArticle(scrapId);
 
-        resultActions.andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/mypage"));
-
+        assertThat(viewName).isEqualTo("redirect:/mypage");
         verify(scrappedArticleService, times(1)).deleteScrappedArticle(scrapId);
     }
 }

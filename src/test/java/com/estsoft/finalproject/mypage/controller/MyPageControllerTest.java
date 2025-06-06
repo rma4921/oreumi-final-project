@@ -1,11 +1,8 @@
 package com.estsoft.finalproject.mypage.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.estsoft.finalproject.category.dto.CategoryResponseDto;
 import com.estsoft.finalproject.category.service.CategoryService;
@@ -21,51 +18,43 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@WithMockUser
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
 class MyPageControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private MyPageController myPageController;
 
-    @MockitoBean
+    @Mock
     private ScrappedArticleService scrappedArticleService;
 
-    @MockitoBean
+    @Mock
     private RelatedStockService relatedStockService;
 
-    @MockitoBean
+    @Mock
     private CategoryService categoryService;
+
+    private Model model;
+
+    private UserDetail userDetail;
 
     // 동엽님 코드에 따라 수정해야 함.
     @BeforeEach
     public void setUpUser() {
+        model = new ConcurrentModel();
         User mockUser = new User();
         mockUser.updateId(1L);
         mockUser.updateNickname("테스트유저1");
-
-        UserDetail userDetail = new UserDetail(mockUser);
-
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        userDetail = new UserDetail(mockUser);
     }
 
     @Test
@@ -83,18 +72,13 @@ class MyPageControllerTest {
         given(categoryService.getCategoriesByScrapId(scrapId))
             .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
 
-        ResultActions resultActions = mockMvc.perform(get("/mypage")
-            .param("scrapPage", "0")
-            .param("keyword", "")
-        );
+        String viewName = myPageController.getScrappedArticles(userDetail, 0, null, model);
 
-        resultActions.andExpect(status().isOk())
-            .andExpect(view().name("layout/mypage/mypage"))
-            .andExpect(model().attributeExists(
-                "scrappedArticle", "totalPages", "currentPage",
-                "startPage", "endPage", "hasPrevBlock",
-                "hasNextBlock", "keyword", "articlesCategory"
-            ));
+        assertThat(viewName).isEqualTo("layout/mypage/mypage");
+        assertThat(model.containsAttribute("scrappedArticle")).isTrue();
+        assertThat(model.containsAttribute("articlesCategory")).isTrue();
+        assertThat(model.getAttribute("currentPage")).isEqualTo(0);
+        assertThat(model.getAttribute("totalPages")).isEqualTo(1);
     }
 
     @Test
@@ -111,18 +95,14 @@ class MyPageControllerTest {
         given(categoryService.getCategoriesByScrapId(scrapId))
             .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
 
-        ResultActions resultActions = mockMvc.perform(get("/mypage")
-            .param("scrapPage", "0")
-            .param("keyword", "tester")
-        );
+        String viewName = myPageController.getScrappedArticles(userDetail, 0, "Test", model);
 
-        resultActions.andExpect(status().isOk())
-            .andExpect(view().name("layout/mypage/mypage"))
-            .andExpect(model().attributeExists(
-                "scrappedArticle", "totalPages", "currentPage",
-                "startPage", "endPage", "hasPrevBlock",
-                "hasNextBlock", "keyword", "articlesCategory"
-            ));
+        assertThat(viewName).isEqualTo("layout/mypage/mypage");
+        assertThat(model.containsAttribute("scrappedArticle")).isTrue();
+        assertThat(model.containsAttribute("articlesCategory")).isTrue();
+        assertThat(model.getAttribute("currentPage")).isEqualTo(0);
+        assertThat(model.getAttribute("totalPages")).isEqualTo(1);
+        assertThat(model.getAttribute("keyword")).isEqualTo("Test");
     }
 
     @Test
@@ -136,34 +116,44 @@ class MyPageControllerTest {
                 "요약", "https://www.naver.com", LocalDateTime.now(),
                 false
             );
+
         List<RelatedStockResponseDTO> stocks = List.of(
             new RelatedStockResponseDTO("테스트1"),
             new RelatedStockResponseDTO("테스트2"),
             new RelatedStockResponseDTO("테스트3")
         );
 
-        given(scrappedArticleService.getScrappedArticleDetail(1L))
+        List<CategoryResponseDto> allCategories = List.of(new CategoryResponseDto("정치"),
+            new CategoryResponseDto("경제"),
+            new CategoryResponseDto("사회"),
+            new CategoryResponseDto("생활/문화"),
+            new CategoryResponseDto("IT/과학"),
+            new CategoryResponseDto("세계")
+        );
+
+        List<CategoryResponseDto> checkedCategories = List.of(
+            new CategoryResponseDto("경제"), new CategoryResponseDto("사회")
+        );
+
+        List<String> checkedCategoryNames = checkedCategories.stream()
+            .map(CategoryResponseDto::getCategoryName)
+            .toList();
+
+        given(scrappedArticleService.getScrappedArticleDetail(scrapId))
             .willReturn(article);
-        given(relatedStockService.findByScrapId(1L))
+        given(relatedStockService.findByScrapId(scrapId))
             .willReturn(stocks);
         given(categoryService.getAllCategories())
-            .willReturn(List.of(new CategoryResponseDto("정치"),
-                new CategoryResponseDto("경제"),
-                new CategoryResponseDto("사회"),
-                new CategoryResponseDto("생활/문화"),
-                new CategoryResponseDto("IT/과학"),
-                new CategoryResponseDto("세계")
-            ));
+            .willReturn(allCategories);
         given(categoryService.getCategoriesByScrapId(scrapId))
-            .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
+            .willReturn(checkedCategories);
 
-        ResultActions resultActions = mockMvc.perform(get("/mypage/scrap/1"));
+        String viewName = myPageController.getScrappedArticleDetail(scrapId, model);
 
-        resultActions.andExpect(status().isOk())
-            .andExpect(view().name("layout/mypage/detail"))
-            .andExpect(model().attributeExists(
-                "scrappedArticle", "relatedStocks",
-                "categories", "checkedCategories"
-            ));
+        assertThat(viewName).isEqualTo("layout/mypage/detail");
+        assertThat(model.getAttribute("scrappedArticle")).isEqualTo(article);
+        assertThat(model.getAttribute("relatedStocks")).isEqualTo(stocks);
+        assertThat(model.getAttribute("categories")).isEqualTo(allCategories);
+        assertThat(model.getAttribute("checkedCategories")).isEqualTo(checkedCategoryNames);
     }
 }

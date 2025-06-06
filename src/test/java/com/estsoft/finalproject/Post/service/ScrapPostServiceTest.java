@@ -2,6 +2,11 @@ package com.estsoft.finalproject.Post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
@@ -9,42 +14,41 @@ import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
 import com.estsoft.finalproject.user.User;
 import com.estsoft.finalproject.user.UserRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
 class ScrapPostServiceTest {
 
-    @Autowired
+    @InjectMocks
     private ScrapPostService scrapPostService;
 
-    @Autowired
+    @Mock
     private ScrapPostRepository scrapPostRepository;
 
-    @Autowired
+    @Mock
     private ScrappedArticleRepository scrappedArticleRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     private ScrappedArticle article;
 
+    private User tester;
+
     @BeforeEach
     public void setUp() {
-        userRepository.deleteAll();
-        scrappedArticleRepository.deleteAll();
-        scrapPostRepository.deleteAll();
-
-        User tester = new User();
-        tester.updateNickname("tester");
-        userRepository.save(tester);
+        tester = new User();
+        tester.updateId(1L);
 
         article = ScrappedArticle.builder()
+            .scrapId(1L)
             .user(tester)
             .scrapDate(LocalDateTime.now())
             .title("테스트 중입니다.")
@@ -53,21 +57,81 @@ class ScrapPostServiceTest {
             .pubDate(LocalDateTime.now())
             .topic("test")
             .build();
-        scrappedArticleRepository.save(article);
     }
 
     @Test
     @DisplayName("게시글 저장 테스트")
     void savePost() {
-        scrapPostService.savePost(article.getScrapId());
+        Long scrapId = article.getScrapId();
 
-        assertThat(scrapPostRepository
-            .existsByScrappedArticle_ScrapId(article.getScrapId())).isTrue();
-        assertThatThrownBy(() -> scrapPostService.savePost(article.getScrapId()))
+        when(scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId))
+            .thenReturn(false);
+        when(scrappedArticleRepository.findById(scrapId))
+            .thenReturn(Optional.of(article));
+
+        scrapPostService.savePost(scrapId, tester);
+
+        verify(scrappedArticleRepository, times(1)).findById(scrapId);
+        verify(scrapPostRepository, times(1))
+            .existsByScrappedArticle_ScrapId(scrapId);
+        verify(scrapPostRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 게시글 저장 시 테스트")
+    void savePostAlreadyExist() {
+        Long scrapId = article.getScrapId();
+
+        when(scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId))
+            .thenReturn(true);
+
+        assertThatThrownBy(() -> scrapPostService.savePost(scrapId, tester))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("이미 게시된 스크랩 기사입니다.");
-        assertThatThrownBy(() -> scrapPostService.savePost(999L))
+
+        verify(scrappedArticleRepository, times(0)).findById(scrapId);
+        verify(scrapPostRepository, times(1))
+            .existsByScrappedArticle_ScrapId(scrapId);
+        verify(scrappedArticleRepository, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 스크랩 ID 저장 시 테스트")
+    void savePostNotExistScrapId() {
+        Long scrapId = 1000L;
+
+        when(scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> scrapPostService.savePost(scrapId, tester))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("해당 스크랩 기사가 존재하지 않습니다.");
+
+        verify(scrappedArticleRepository, times(1)).findById(scrapId);
+        verify(scrapPostRepository, times(1))
+            .existsByScrappedArticle_ScrapId(scrapId);
+        verify(scrappedArticleRepository, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("본인 소유 아닌 스크랩 기사 공유 시 테스트")
+    void savePostNotExistUser() {
+        Long scrapId = article.getScrapId();
+        User tester2 = new User();
+        tester2.updateId(2L);
+
+        when(scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId))
+            .thenReturn(false);
+        when(scrappedArticleRepository.findById(scrapId))
+            .thenReturn(Optional.of(article));
+
+        assertThatThrownBy(() -> scrapPostService.savePost(scrapId, tester2))
+            .isInstanceOf(SecurityException.class)
+            .hasMessageContaining("본인의 스크랩 기사만 공유할 수 있습니다.");
+
+        verify(scrappedArticleRepository, times(1)).findById(scrapId);
+        verify(scrapPostRepository, times(1))
+            .existsByScrappedArticle_ScrapId(scrapId);
+        verify(scrappedArticleRepository, times(0)).save(any());
     }
 }

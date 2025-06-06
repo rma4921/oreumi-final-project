@@ -1,37 +1,42 @@
 package com.estsoft.finalproject.mypage.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
 import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.data.domain.Pageable;
 
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
 class ScrappedArticleServiceTest {
 
-    @Autowired
+    @Mock
     private ScrappedArticleRepository scrappedArticleRepository;
 
-    @Autowired
+    @InjectMocks
     private ScrappedArticleService scrappedArticleService;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Mock
+    private ScrapPostRepository scrapPostRepository;
 
     private User tester;
 
@@ -39,58 +44,72 @@ class ScrappedArticleServiceTest {
 
     @BeforeEach
     public void setUp() {
-        userRepository.deleteAll();
-        scrappedArticleRepository.deleteAll();
-
         tester = new User();
         tester.updateNickname("tester");
-        userRepository.save(tester);
 
-        for (int i = 1; i <= 3; i++ ) {
-            article = scrappedArticleRepository.save(ScrappedArticle.builder()
-                .user(tester)
-                .scrapDate(LocalDateTime.now())
-                .title(i + "번째 테스트 중입니다.")
-                .link("https://www.naver.com")
-                .description(i + "번째 테스트용 더미데이터입니다.")
-                .pubDate(LocalDateTime.now())
-                .topic("test" + i)
-                .build()
-            );
-        }
+        article = ScrappedArticle.builder()
+            .scrapId(1L)
+            .user(tester)
+            .scrapDate(LocalDateTime.now())
+            .title("테스트 중입니다.")
+            .link("https://www.naver.com")
+            .description("테스트용 더미데이터입니다.")
+            .pubDate(LocalDateTime.now())
+            .topic("test")
+            .build();
     }
 
     @Test
     @DisplayName("스크랩한 기사 조회 테스트")
     void getScrappedArticlesByUser() {
-        Page<ScrappedArticleResponseDto> result = scrappedArticleService
-            .getScrappedArticlesByUser(tester, PageRequest
-                .of(0, 10, Sort.by(Direction.DESC, "scrapDate")));
+        List<ScrappedArticle> articleList = List.of(article);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ScrappedArticle> page = new PageImpl<>(articleList);
 
-        assertThat(result.getContent()).hasSize(3);
-        assertThat(result.getContent().get(0).getTopic()).isEqualTo("test1");
-        assertThat(result.getContent().get(1).getTopic()).isEqualTo("test2");
-        assertThat(result.getContent().get(2).getTopic()).isEqualTo("test3");
+        when(scrappedArticleRepository.findAllByUserOrderByScrapDateDesc(tester, pageable))
+            .thenReturn(page);
+
+        Page<ScrappedArticleResponseDto> result = scrappedArticleService
+            .getScrappedArticlesByUser(tester, pageable);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getTopic()).isEqualTo("test");
     }
 
     @Test
     @DisplayName("스크랩한 기사 제목 조회 테스트")
     void getScrappedArticlesByUserAndTitle() {
+        List<ScrappedArticle> articleList = List.of(article);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ScrappedArticle> page = new PageImpl<>(articleList);
+
+        when(scrappedArticleRepository
+            .findByUserAndTitleContainingOrderByScrapDateDesc(tester, "테스트", pageable))
+            .thenReturn(page);
+
         Page<ScrappedArticleResponseDto> result = scrappedArticleService
-            .getScrappedArticlesByUserAndTitle(tester, "2번째", PageRequest.of(0, 10));
+            .getScrappedArticlesByUserAndTitle(tester, "테스트", pageable);
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getTopic()).isEqualTo("test2");
+        assertThat(result.getContent().get(0).getTopic()).isEqualTo("test");
     }
 
     @Test
     @DisplayName("스크랩한 기사 상세보기 테스트")
     void getScrappedArticleDetail() {
-        ScrappedArticleDetailResponseDto result = scrappedArticleService
-            .getScrappedArticleDetail(article.getScrapId());
+        Long scrapId = article.getScrapId();
 
-        assertThat(result.getScrapId()).isEqualTo(article.getScrapId());
-        assertThat(result.getTitle()).isEqualTo(article.getTitle());
+        when(scrappedArticleRepository.findById(scrapId))
+            .thenReturn(Optional.of(article));
+        when(scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId))
+            .thenReturn(true);
+
+        ScrappedArticleDetailResponseDto result = scrappedArticleService
+            .getScrappedArticleDetail(scrapId);
+
+        assertThat(result.getScrapId()).isEqualTo(1L);
+        assertThat(result.getTitle()).isEqualTo("테스트 중입니다.");
+        assertThat(result.isShared()).isTrue();
     }
 
     @Test
@@ -98,6 +117,7 @@ class ScrappedArticleServiceTest {
     void deleteScrappedArticle() {
         scrappedArticleService.deleteScrappedArticle(article.getScrapId());
 
-        assertThat(scrappedArticleRepository.findById(article.getScrapId())).isEmpty();
+        verify(scrappedArticleRepository, times(1))
+            .deleteById(article.getScrapId());
     }
 }

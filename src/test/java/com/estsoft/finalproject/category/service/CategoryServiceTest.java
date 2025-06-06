@@ -2,6 +2,10 @@ package com.estsoft.finalproject.category.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.estsoft.finalproject.category.domain.Category;
 import com.estsoft.finalproject.category.domain.ScrappedArticleCategory;
@@ -11,34 +15,31 @@ import com.estsoft.finalproject.category.repository.ScrappedArticleCategoryRepos
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
 import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
 
-    @Autowired
+    @InjectMocks
     private CategoryService categoryService;
 
-    @Autowired
+    @Mock
     private ScrappedArticleCategoryRepository scrappedArticleCategoryRepository;
 
-    @Autowired
+    @Mock
     private ScrappedArticleRepository scrappedArticleRepository;
 
-    @Autowired
+    @Mock
     private CategoryRepository categoryRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     private User tester;
 
@@ -48,14 +49,8 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        scrappedArticleCategoryRepository.deleteAll();
-        scrappedArticleRepository.deleteAll();
-        categoryRepository.deleteAll();
-        userRepository.deleteAll();
-
         tester = new User();
         tester.updateNickname("tester");
-        userRepository.save(tester);
 
         article = ScrappedArticle.builder()
             .user(tester)
@@ -66,55 +61,56 @@ class CategoryServiceTest {
             .pubDate(LocalDateTime.now())
             .topic("test")
             .build();
-        scrappedArticleRepository.save(article);
+        article.updateScrapId(1L);
 
         category = new Category("경제");
-        categoryRepository.save(category);
-
-        ScrappedArticleCategory sac = ScrappedArticleCategory.builder()
-            .scrappedArticle(article)
-            .category(category)
-            .build();
-        scrappedArticleCategoryRepository.save(sac);
+        category.updateCategoryId(1L);
     }
 
     @Test
     @DisplayName("카테고리 업데이트 테스트")
     void updateCategories() {
         Category updateCategory = new Category("사회");
-        categoryRepository.save(updateCategory);
+        updateCategory.updateCategoryId(2L);
+
+        when(scrappedArticleRepository.findById(1L)).thenReturn(Optional.of(article));
+        when(scrappedArticleCategoryRepository.findByScrappedArticle(article))
+            .thenReturn(List.of(
+               ScrappedArticleCategory.builder()
+                   .scrappedArticle(article)
+                   .category(category)
+                   .build()
+            ));
+        when(categoryRepository.findByCategoryName("사회"))
+            .thenReturn(Optional.of(updateCategory));
 
         categoryService.updateCategories(article.getScrapId(), List.of("사회"));
 
-        List<CategoryResponseDto> result = categoryService.getCategoriesByScrapId(
-            article.getScrapId());
-
-        assertEquals(1, result.size());
-        assertThat(result.get(0).getCategoryName()).isEqualTo("사회");
+        verify(scrappedArticleCategoryRepository, times(1)).delete(any());
+        verify(scrappedArticleCategoryRepository, times(1)).save(any());
     }
 
     @Test
     void getAllCategories() {
-        Category updateCategory = new Category("사회");
-        categoryRepository.save(updateCategory);
+        when(categoryRepository.findAll()).thenReturn(List.of(
+            new Category("경제"),
+            new Category("사회")
+        ));
 
         List<CategoryResponseDto> result = categoryService.getAllCategories();
 
-        assertEquals(2, result.size());
-        assertThat(result).extracting(CategoryResponseDto::getCategoryName)
+        assertThat(result).hasSize(2)
+            .extracting(CategoryResponseDto::getCategoryName)
             .containsExactlyInAnyOrder("경제", "사회");
     }
 
     @Test
     void getCategoriesByScrapId() {
-        Category category2 = new Category("IT/과학");
-        categoryRepository.save(category2);
-
-        ScrappedArticleCategory sac = ScrappedArticleCategory.builder()
-            .scrappedArticle(article)
-            .category(category2)
-            .build();
-        scrappedArticleCategoryRepository.save(sac);
+        when(scrappedArticleCategoryRepository.findCategoriesByScrapId(article.getScrapId()))
+            .thenReturn(List.of(
+                new Category("경제"),
+                new Category("IT/과학")
+            ));
 
         List<CategoryResponseDto> result = categoryService.getCategoriesByScrapId(article.getScrapId());
 
