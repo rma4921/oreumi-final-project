@@ -2,6 +2,7 @@ package com.estsoft.finalproject.user.config;
 
 import com.estsoft.finalproject.user.jwt.CustomOAuth2SuccessHandler;
 import com.estsoft.finalproject.user.jwt.JwtAuthenticationFilter;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import com.estsoft.finalproject.user.service.CustomOAuth2UsersService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ public class SecurityConfig {
     private final CustomOAuth2UsersService customOAuth2UserService;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UsersRepository usersRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -48,16 +50,30 @@ public class SecurityConfig {
                         .logoutSuccessHandler(new LogoutSuccessHandler() {
                             @Override
                             public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-                                // 쿠키 삭제
-                                Cookie cookie = new Cookie("JWT", null);
-                                cookie.setHttpOnly(true);
-                                cookie.setPath("/");
-                                cookie.setMaxAge(0);
-                                response.addCookie(cookie);
+                                // Access Token 쿠키 삭제
+                                Cookie jwtCookie = new Cookie("JWT", null);
+                                jwtCookie.setHttpOnly(true);
+                                jwtCookie.setPath("/");
+                                jwtCookie.setMaxAge(0);
+                                response.addCookie(jwtCookie);
 
-                                log.info("Spring Security 로그아웃 시 JWT 쿠키 삭제 완료");
+                                // Refresh Token 쿠키 삭제
+                                Cookie refreshCookie = new Cookie("REFRESH", null);
+                                refreshCookie.setHttpOnly(true);
+                                refreshCookie.setPath("/");
+                                refreshCookie.setMaxAge(0);
+                                response.addCookie(refreshCookie);
 
-                                // 리다이렉트 또는 상태 코드 응답
+                                // DB의 Refresh Token 삭제
+                                if (authentication != null && authentication.getPrincipal() instanceof com.estsoft.finalproject.user.dto.CustomUsersDetails userDetails) {
+                                    com.estsoft.finalproject.user.domain.Users user = userDetails.getUsers();
+                                    user.setRefreshToken(null);  // DB에서 refresh token 제거
+                                    usersRepository.save(user);
+                                    log.info("DB에서 Refresh Token 삭제 완료 - 사용자: {}", user.getEmail());
+                                }
+
+                                log.info("Spring Security 로그아웃 시 JWT, Refresh 쿠키 및 DB 토큰 삭제 완료");
+
                                 response.sendRedirect("/custom-login?logout");
                             }
                         })

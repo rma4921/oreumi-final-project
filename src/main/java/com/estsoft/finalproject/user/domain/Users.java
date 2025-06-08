@@ -44,6 +44,9 @@ public class Users {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     public Users(String provider, String email, String nickname, Role role) {
         this.provider = provider;
         this.email = email;

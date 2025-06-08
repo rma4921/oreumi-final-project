@@ -42,6 +42,24 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         log.info("JWT 쿠키 설정 완료");
 
+        // Refresh Token 생성
+        String refreshToken = jwtUtil.generateRefreshToken(email, provider);
+
+        usersRepository.findByProviderAndEmail(provider, email).ifPresent(user -> {
+            user.setRefreshToken(refreshToken);
+            usersRepository.save(user);
+            log.info("리프레시 토큰 DB 저장 완료");
+        });
+
+        Cookie refreshCookie = new Cookie("REFRESH", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+
+        response.addCookie(refreshCookie);
+
+        log.info("리프레시 쿠키 설정 완료");
+
         // 로그인 후 리디렉션
         response.sendRedirect("/loginSuccessTest");
     }
