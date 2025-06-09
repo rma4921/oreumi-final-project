@@ -1,5 +1,6 @@
 package com.estsoft.finalproject.user.config;
 
+import com.estsoft.finalproject.user.jwt.CustomOAuth2FailureHandler;
 import com.estsoft.finalproject.user.jwt.CustomOAuth2SuccessHandler;
 import com.estsoft.finalproject.user.jwt.JwtAuthenticationFilter;
 import com.estsoft.finalproject.user.repository.UsersRepository;
@@ -23,6 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
     private final CustomOAuth2UsersService customOAuth2UserService;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -40,10 +42,7 @@ public class SecurityConfig {
                         .loginPage("/custom-login")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(customOAuth2SuccessHandler)
-                        .failureHandler((request, response, exception) -> {
-                            exception.printStackTrace();
-                            response.sendRedirect("/login?error");
-                        })
+                        .failureHandler(customOAuth2FailureHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")  // 기본 로그아웃 URL
