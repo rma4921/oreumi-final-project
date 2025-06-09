@@ -45,4 +45,9 @@ public class UsersViewController {
 
         return "loginSuccessTest";
     }
+
+    @GetMapping("/another-page")
+    public String anotherPage() {
+        return "another-page";  // templates/another-page.html을 반환
+    }
 }

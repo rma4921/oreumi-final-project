@@ -61,6 +61,11 @@
     <div style="margin-top: 20px;">
         <button id="refreshTokenBtn">토큰 갱신 테스트</button>
     </div>
+
+    <!-- 다음 페이지로 넘어갈 때 토큰 확인 위한 버튼 -->
+    <div style="margin-top: 20px;">
+        <button onclick="goToAnotherPage()">다른 페이지로 이동</button>
+    </div>
 </div>
 
 <!-- 리프레시 토큰을 위한 axios -->
@@ -110,6 +115,11 @@
                 alert('토큰 갱신 실패! 콘솔 확인');
             });
     });
+
+    // 다른 페이지로 넘어갈 때 토큰 확인 위한 버튼
+    function goToAnotherPage() {
+        window.location.href = "/another-page";
+    }
 </script>
 
 </body>
