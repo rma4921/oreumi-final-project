@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -12,13 +13,17 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtUtil {
+
     private SecretKey secretKey;
-    private final long EXPIRATION_TIME = 1000 * 60; // 1000 * 60 * 60 = 1시간
-    private final long REFRESH_TIME = 1000 * 60 * 60 * 24 * 7;
+
+    @Value("${jwt.accessTokenExpirationSeconds}")
+    private long accessTokenExpirationSeconds;
+
+    @Value("${jwt.refreshTokenExpirationSeconds}")
+    private long refreshTokenExpirationSeconds;
 
     @PostConstruct
     public void init() {
-        // 안전한 키를 생성합니다
         secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         log.info("JWT 키 초기화 완료");
     }
@@ -31,7 +36,7 @@ public class JwtUtil {
                 .setSubject(email)
                 .claim("provider", provider)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationSeconds * 1000))
                 .signWith(secretKey)
                 .compact();
 
@@ -45,7 +50,7 @@ public class JwtUtil {
                 .setSubject(email)
                 .claim("provider", provider)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationSeconds * 1000))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }

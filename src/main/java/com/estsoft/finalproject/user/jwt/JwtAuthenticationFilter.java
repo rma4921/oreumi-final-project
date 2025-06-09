@@ -8,15 +8,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -26,14 +28,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UsersRepository usersRepository;
 
+    @Value("${jwt.cookieExpirationSeconds}")
+    private int cookieExpirationSeconds;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 모든 요청에 대해 JWT 검사 시작
         String jwt = null;
 
-        // 쿠키에서 JWT 추출
+        // 쿠키에서 jwt 추출
         if (request.getCookies() != null) {
             jwt = Arrays.stream(request.getCookies())
                     .filter(cookie -> cookie.getName().equals("JWT"))
@@ -42,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .orElse(null);
         }
 
-        // JWT가 없는 경우 → 인증 없이 계속 진행
+        // jwt가 없은 경우 인증 없이 계속 진행
         if (jwt == null) {
             log.info("JWT 토큰이 없습니다.");
             SecurityContextHolder.clearContext();
@@ -51,7 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            // 이메일 및 provider 추출
             String email = jwtUtil.extractEmail(jwt);
             String provider = jwtUtil.extractProvider(jwt);
 
@@ -59,11 +62,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtUtil.isTokenExpired(jwt)) {
                 log.info("Access Token이 만료됨. Refresh Token으로 재발급 시도.");
 
-                // Refresh 토큰 꺼내기
+                // Refresh Token 확인
                 String refreshToken = null;
                 if (request.getCookies() != null) {
                     refreshToken = Arrays.stream(request.getCookies())
-                            .filter(cookie -> cookie.getName().equals("Refresh"))
+                            .filter(cookie -> cookie.getName().equals("REFRESH")) // 대소문자 통일 (REFRESH)
                             .findFirst()
                             .map(Cookie::getValue)
                             .orElse(null);
@@ -76,14 +79,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Users user = usersRepository.findByProviderAndEmail(refreshProvider, refreshEmail)
                             .orElseThrow(() -> new IllegalArgumentException("해당 사용자 없음"));
 
-                    // 새 Access Token 발급
+                    // 새로운 Access Token 발급
                     String newAccessToken = jwtUtil.generateToken(refreshEmail, refreshProvider);
 
                     // 쿠키로 다시 설정
                     Cookie newCookie = new Cookie("JWT", newAccessToken);
                     newCookie.setHttpOnly(true);
                     newCookie.setPath("/");
-                    newCookie.setMaxAge(60 * 60); // 1시간
+                    newCookie.setMaxAge(cookieExpirationSeconds);
                     response.addCookie(newCookie);
 
                     // SecurityContext 설정
@@ -105,7 +108,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-            // 기존 Access Token이 유효한 경우
+            // 기존 Access Token 유효한 경우
             Users user = usersRepository.findByProviderAndEmail(provider, email)
                     .orElseThrow(() -> new IllegalArgumentException("해당 사용자 없음"));
             CustomUsersDetails userDetails = new CustomUsersDetails(user);
@@ -123,9 +126,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private void redirectToLogin(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/custom-login");
     }
 }
