@@ -35,7 +35,45 @@ body {
     background-color: #00b030;
 }
 
-.container {
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    border-bottom: 1px solid #ddd;
+    gap: 30px;
+    padding-bottom: 10px;
+}
+
+.tabs a {
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
+    text-decoration: none;
+    padding: 8px 0;
+    position: relative;
+}
+
+.tabs a:hover {
+    color: #00c73c;
+}
+
+.tabs a.active-tab {
+    color: #00c73c;
+    font-weight: 600;
+}
+
+.tabs a.active-tab::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #00c73c;
+    position: absolute;
+    bottom: -11px;
+    left: 0;
+}
+
+.scrap-section, .comment-section {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
@@ -49,7 +87,7 @@ body {
     padding-left: 10px;
 }
 
-.post-item {
+.post-item, .comment-item{
     padding: 14px 0;
     border-bottom: 1px solid #eee;
 }

@@ -6,13 +6,25 @@
     <link href="/css/mypage/mypage.css" rel="stylesheet">
 </head>
 <body>
-<form action="/mypage" method="get" class="search-form">
+<form th:action="@{/mypage}" method="get" class="search-form">
+    <input type="hidden" name="tab" th:value="${tab}"/>
     <input name="keyword" type="text" placeholder="제목으로 검색"
            th:value="${keyword} ?: ''" class="search-input"/>
     <button type="submit" class="search-button">검색</button>
 </form>
 
-<div class="container">
+<div class="tabs">
+    <a th:href="@{/mypage(tab='scrap')}"
+       th:classappend="${tab == 'scrap'} ? ' active-tab' : ''">
+        스크랩한 기사
+    </a>
+    <a th:href="@{/mypage(tab='comment')}"
+       th:classappend="${tab == 'comment'} ? ' active-tab' : ''">
+        작성한 댓글
+    </a>
+</div>
+
+<div th:if="${tab == 'scrap'}" class="scrap-section">
     <h3 class="section-title">스크랩한 게시글</h3>
     <div th:each="item : ${scrappedArticle}">
         <div class="post-item">
@@ -49,6 +61,32 @@
             </li>
         </ul>
     </nav>
+</div>
+
+<div th:if="${tab == 'comment'}" class="comment-section">
+    <h3 class="section-title">작성한 댓글</h3>
+    <div th:each="c : ${comments}">
+        <div class="comment-item">
+            <div><strong>게시글:</strong> <a th:href="@{/mypage/scrap/{id}(id=${c.scrapId})}" th:text="${c.articleTitle}"></a></div>
+            <div><strong>작성한 댓글:</strong> <span th:text="${c.content}"></span></div>
+            <div><strong>작성일:</strong> <span th:text="${#temporals.format(c.createTime, 'yyyy-MM-dd HH:mm')}"></span></div>
+        </div>
+    </div>
+    <div th:if="${totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:if="${hasPrevBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${startPage - 1})}">«</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/mypage(commentPage=${i}, tab='comment')}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:if="${hasNextBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${endPage + 1})}">»</a>
+            </li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>
