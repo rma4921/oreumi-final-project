@@ -6,6 +6,8 @@ import static org.mockito.BDDMockito.given;
 
 import com.estsoft.finalproject.category.dto.CategoryResponseDto;
 import com.estsoft.finalproject.category.service.CategoryService;
+import com.estsoft.finalproject.comment.dto.CommentResponseDto;
+import com.estsoft.finalproject.comment.service.CommentService;
 import com.estsoft.finalproject.mypage.dto.RelatedStockResponseDTO;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
@@ -43,6 +45,9 @@ class MyPageControllerTest {
     @Mock
     private CategoryService categoryService;
 
+    @Mock
+    private CommentService commentService;
+
     private Model model;
 
     private UserDetail userDetail;
@@ -58,8 +63,8 @@ class MyPageControllerTest {
     }
 
     @Test
-    @DisplayName("메인 페이지 기본 화면 테스트")
-    public void getScrappedArticles_NoKeyWord() throws Exception {
+    @DisplayName("메인 페이지 기본 화면 테스트 - 스크랩 탭")
+    public void getScrappedArticles_NoKeyWord_Scrap() throws Exception {
         Long scrapId = 1L;
 
         List<ScrappedArticleResponseDto> article = List.of(
@@ -72,18 +77,19 @@ class MyPageControllerTest {
         given(categoryService.getCategoriesByScrapId(scrapId))
             .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
 
-        String viewName = myPageController.getScrappedArticles(userDetail, 0, null, model);
+        String viewName = myPageController.getScrappedArticles(userDetail,0, "scrap", 0, null, model);
 
         assertThat(viewName).isEqualTo("layout/mypage/mypage");
         assertThat(model.containsAttribute("scrappedArticle")).isTrue();
         assertThat(model.containsAttribute("articlesCategory")).isTrue();
         assertThat(model.getAttribute("currentPage")).isEqualTo(0);
         assertThat(model.getAttribute("totalPages")).isEqualTo(1);
+        assertThat(model.getAttribute("tab")).isEqualTo("scrap");
     }
 
     @Test
-    @DisplayName("메인 페이지 검색 화면 테스트")
-    public void getScrappedArticles_WithKeyWord() throws Exception {
+    @DisplayName("메인 페이지 검색 화면 테스트 - 스크랩 탭")
+    public void getScrappedArticles_WithKeyWord_Scrap() throws Exception {
         Long scrapId = 1L;
         List<ScrappedArticleResponseDto> articles = List.of(
             new ScrappedArticleResponseDto(scrapId, "Test 중입니다.", "test", LocalDateTime.now())
@@ -95,7 +101,7 @@ class MyPageControllerTest {
         given(categoryService.getCategoriesByScrapId(scrapId))
             .willReturn(List.of(new CategoryResponseDto("경제"), new CategoryResponseDto("사회")));
 
-        String viewName = myPageController.getScrappedArticles(userDetail, 0, "Test", model);
+        String viewName = myPageController.getScrappedArticles(userDetail, 0, "scrap", 0, "Test", model);
 
         assertThat(viewName).isEqualTo("layout/mypage/mypage");
         assertThat(model.containsAttribute("scrappedArticle")).isTrue();
@@ -103,6 +109,52 @@ class MyPageControllerTest {
         assertThat(model.getAttribute("currentPage")).isEqualTo(0);
         assertThat(model.getAttribute("totalPages")).isEqualTo(1);
         assertThat(model.getAttribute("keyword")).isEqualTo("Test");
+        assertThat(model.getAttribute("tab")).isEqualTo("scrap");
+    }
+
+    @Test
+    @DisplayName("메인 페이지 기본 화면 테스트 - 댓글 탭")
+    public void getScrappedArticles_NoKeyWord_Comment() throws Exception {
+        Long scrapId = 1L;
+
+        List<CommentResponseDto> comment = List.of(
+            new CommentResponseDto(1L, scrapId, "제목입니다.","댓글입니다.", LocalDateTime.now())
+        );
+        Page<CommentResponseDto> page = new PageImpl<>(comment, PageRequest.of(0, 10), 1);
+
+        given(commentService.getCommentsByUser(any(), any()))
+            .willReturn(page);
+
+        String viewName = myPageController.getScrappedArticles(userDetail,0, "comment", 0, null, model);
+
+        assertThat(viewName).isEqualTo("layout/mypage/mypage");
+        assertThat(model.containsAttribute("comments")).isTrue();
+        assertThat(model.getAttribute("currentPage")).isEqualTo(0);
+        assertThat(model.getAttribute("totalPages")).isEqualTo(1);
+        assertThat(model.getAttribute("tab")).isEqualTo("comment");
+    }
+
+    @Test
+    @DisplayName("메인 페이지 검색 화면 테스트 - 댓글 탭")
+    public void getScrappedArticles_WithKeyWord_Comment() throws Exception {
+        Long scrapId = 1L;
+
+        List<CommentResponseDto> comment = List.of(
+            new CommentResponseDto(1L, scrapId, "제목입니다.","댓글입니다.", LocalDateTime.now())
+        );
+        Page<CommentResponseDto> page = new PageImpl<>(comment, PageRequest.of(0, 10), 1);
+
+        given(commentService.findByUserAndContentContaining(any(), any(), any()))
+            .willReturn(page);
+
+        String viewName = myPageController.getScrappedArticles(userDetail, 0, "comment", 0, "댓글", model);
+
+        assertThat(viewName).isEqualTo("layout/mypage/mypage");
+        assertThat(model.containsAttribute("comments")).isTrue();
+        assertThat(model.getAttribute("currentPage")).isEqualTo(0);
+        assertThat(model.getAttribute("totalPages")).isEqualTo(1);
+        assertThat(model.getAttribute("keyword")).isEqualTo("댓글");
+        assertThat(model.getAttribute("tab")).isEqualTo("comment");
     }
 
     @Test
