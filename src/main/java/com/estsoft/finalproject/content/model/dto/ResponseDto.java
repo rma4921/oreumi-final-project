@@ -1,6 +1,8 @@
 package com.estsoft.finalproject.content.model.dto;
 
 import java.util.Collection;
+import java.util.Map;
+
 import org.springframework.http.HttpStatusCode;
 
 public class ResponseDto<T> {
@@ -31,6 +33,8 @@ public class ResponseDto<T> {
             return 0;
         } else if (item instanceof Collection itemlist) {
             return itemlist.size();
+        } else if (item instanceof Map itemMap) {
+            return itemMap.size();
         }
         return 1;
     }

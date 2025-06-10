@@ -5,4 +5,4 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
-public record NewsSearchItem(String headline, String summary, String link, LocalDateTime timestamp) { }
+public record NewsSearchItem(String headline, String summary, String link, String refLink, LocalDateTime timestamp) { }
