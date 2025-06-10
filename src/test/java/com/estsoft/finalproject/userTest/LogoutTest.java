@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import com.estsoft.finalproject.user.handler.CustomLogoutSuccessHandler;
+import com.estsoft.finalproject.user.jwt.JwtUtil;
 import com.estsoft.finalproject.user.repository.UsersRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,9 @@ import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
 public class LogoutTest {
+    @Mock
+    private JwtUtil jwtUtil;
+
     @Mock
     private UsersRepository usersRepository;
 
@@ -45,7 +49,7 @@ public class LogoutTest {
 
     @BeforeEach
     void setUp() {
-        logoutSuccessHandler = new CustomLogoutSuccessHandler(usersRepository);
+        logoutSuccessHandler = new CustomLogoutSuccessHandler(usersRepository, jwtUtil);
     }
 
     @Test
