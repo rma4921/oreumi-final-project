@@ -2,8 +2,8 @@ package com.estsoft.finalproject.userTest;
 
 import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
-import com.estsoft.finalproject.user.jwt.CustomOAuth2FailureHandler;
-import com.estsoft.finalproject.user.jwt.CustomOAuth2SuccessHandler;
+import com.estsoft.finalproject.user.handler.CustomOAuth2FailureHandler;
+import com.estsoft.finalproject.user.handler.CustomOAuth2SuccessHandler;
 import com.estsoft.finalproject.user.jwt.JwtUtil;
 import com.estsoft.finalproject.user.repository.UsersRepository;
 import com.estsoft.finalproject.user.service.CustomOAuth2UsersService;
@@ -159,7 +159,7 @@ public class LoginTest {
         // given
         String provider = "google";
         String email = "test@example.com";
-        String nickname = "테스트유저";
+        String nickname = "test";
 
         // OAuth2UserRequest mocking
         OAuth2UserRequest userRequest = mock(OAuth2UserRequest.class);
