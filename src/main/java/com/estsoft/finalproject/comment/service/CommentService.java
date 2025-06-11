@@ -63,6 +63,19 @@ public class CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
         commentRepository.delete(comment);
+
+        //public void deleteComment(Long commentId, Long userId) {
+        //    Comment comment = commentRepository.findById(commentId)
+        //        .orElseThrow(() -> new IllegalArgumentException("댓글 없음"));
+        //
+        //    if (!comment.getUserId().equals(userId)) {
+        //        throw new SecurityException("자신의 댓글만 삭제할 수 있습니다.");
+        //    }
+        //
+        //    commentRepository.delete(comment);
+        //}
+
+        //권한 체크 메서드 준비(삭제/수정)
     }
 
 
@@ -70,9 +83,15 @@ public class CommentService {
         if (content == null || content.trim().isEmpty()) {
             throw new IllegalArgumentException("빈 공백은 등록할 수 없어요");
         }
+
+        if (content.length() > 1000) {
+            throw new IllegalArgumentException("댓글은 1000자 이하만 작성 가능합니다.");
+        }
     }
 
     public List<Comment> findByUserId(Long userId) {
         return commentRepository.findByUserId(userId);
     }
+
+
 }
