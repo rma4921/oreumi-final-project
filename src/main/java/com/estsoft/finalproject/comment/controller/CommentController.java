@@ -3,6 +3,7 @@ package com.estsoft.finalproject.comment.controller;
 import com.estsoft.finalproject.comment.dto.CommentRequest;
 import com.estsoft.finalproject.comment.dto.CommentResponse;
 import com.estsoft.finalproject.comment.entity.Comment;
+import com.estsoft.finalproject.comment.repository.CommentRepository;
 import com.estsoft.finalproject.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
+    private final CommentRepository commentRepository;
 
     @PostMapping
     public ResponseEntity<CommentResponse> save(@RequestBody CommentRequest request) {
@@ -33,9 +35,22 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Long commentId) {
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
+
+        //@DeleteMapping("/{commentId}")
+        //public ResponseEntity<Void> deleteComment(
+        //        @PathVariable Long commentId,
+        //        @AuthenticationPrincipal CustomUsersDetails userDetails
+        //) {
+        //    Long userId = userDetails.getUsers().getUserId();
+        //    commentService.deleteComment(commentId, userId);
+        //    return ResponseEntity.noContent().build();
+        //}
+
+        // 권한 체크 메서드 준비(삭제 /수정)
     }
 
     @PutMapping("/{commentId}")
@@ -52,4 +67,5 @@ public class CommentController {
                 .toList();
         return ResponseEntity.ok(response);
     }
+
 }
