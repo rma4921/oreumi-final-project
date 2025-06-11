@@ -72,7 +72,7 @@ public class AlanCommunicationServiceTest {
     @Test
     public void testSummarizeArticle() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSummarizeArticle()");
-        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://n.news.naver.com/mnews/article/008/0005205597?sid=101");
+        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://www.donga.com/news/Politics/article/all/20250526/131671484/2");
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getContent()).isNotEmpty();
         logger.info("Question is: " + res.getQuestion());
@@ -107,7 +107,7 @@ public class AlanCommunicationServiceTest {
         Assertions.assertThat(topic).isNotEmpty();
         Assertions.assertThat(category).isNotEmpty();
         Assertions.assertThat(companies.isArray()).isTrue();
-        companies.forEach(x -> company_list.append("[ Company Name: " + x.get("company_name").asText() + " ISIN: " + x.get("isin_code").asText() + " Corporate Number: " + x.get("corporate_number").asText() + " ]"));
+        companies.forEach(x -> company_list.append("[ Company Name: " + x.get("company_name").asText() + " ]"));
         logger.info("Headline is: " + headline);
         logger.info("Summary is: " + content);
         logger.info("Topic is: " + topic);

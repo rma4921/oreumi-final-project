@@ -25,7 +25,7 @@ public class RecommendationService {
 
     public ResponseDto<String> getInvestmentTacticForCompany(String companyName) {
         ResponseDto<List<StockItem>> stockPriceData = stockPriceService.getStockPriceByName(companyName, 30);
-        ResponseDto<List<NewsSearchItem>> newsItems = webSearchService.getSearchResults(companyName, 20);
+        ResponseDto<List<NewsSearchItem>> newsItems = webSearchService.getSearchResults(companyName, 5, false);
 
         StringBuilder stockPriceString = new StringBuilder();
         if (stockPriceData.getResponseCode() == HttpStatus.OK && stockPriceData.getSize() != 0) {
@@ -33,7 +33,7 @@ public class RecommendationService {
         }
         StringBuilder newsItemsForCompany = new StringBuilder();
         if (newsItems.getResponseCode() == HttpStatus.OK && newsItems.getSize() != 0) {
-            newsItems.getItem().forEach(x -> { newsItemsForCompany.append(" [ 제목: " + x.headline() + " 날짜: " + x.timestamp() + "] "); });
+            newsItems.getItem().forEach(x -> { newsItemsForCompany.append(" [ 제목: <" + x.headline() + "> 날짜: <" + x.timestamp() + "> ] "); });
         }
         
         AlanResponseDto rez = alanCommunicationService.getResultFromAlan(SimpleAlanKoreanPromptBuilder.start().

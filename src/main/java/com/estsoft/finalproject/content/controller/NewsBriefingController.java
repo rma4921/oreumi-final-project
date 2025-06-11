@@ -29,7 +29,7 @@ public class NewsBriefingController {
 
     @GetMapping("/api/briefing/latest")
     public ResponseEntity<ResponseDto<List<NewsSearchItem>>> latestNewsItems() {
-        ResponseDto<List<NewsSearchItem>> responseDto = webSearchService.getSearchResults("국내 주식", 30);
+        ResponseDto<List<NewsSearchItem>> responseDto = webSearchService.getSearchResults("국내 주식", 60, true);
         return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto);
     }
 

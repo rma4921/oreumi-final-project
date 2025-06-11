@@ -22,7 +22,7 @@ public class WebSearchServiceTest {
     @Test
     void testGetSearchResults() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testGetSearchResults()");
-        ResponseDto<List<NewsSearchItem>> res = webSearchService.getSearchResults("국내 주식", 30);
+        ResponseDto<List<NewsSearchItem>> res = webSearchService.getSearchResults("국내 주식", 60, true);
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         logger.info("Size of result is: " + res.getSize());
         res.getItem().forEach(x -> logger.info("Headline is: " + x.headline() + "\n Date is: " + x.timestamp()));

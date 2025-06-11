@@ -38,7 +38,7 @@ public class WebSearchService {
         NAVER_API_SECRET = apiSecret;
     }
     
-    public ResponseDto<List<NewsSearchItem>> getSearchResults(String query, int numOfItems) {
+    public ResponseDto<List<NewsSearchItem>> getSearchResults(String query, int numOfItems, boolean naverOnly) {
         String query_encoded = "";
         List<NewsSearchItem> retList = new ArrayList<>();
         try {
@@ -60,7 +60,11 @@ public class WebSearchService {
                     .summary(Optional.ofNullable(x.get("description")).map(JsonNode::asText).orElse("Description node in search result is NULL"))
                     .timestamp(Optional.ofNullable(x.get("pubDate")).map(pubDate -> LocalDateTime.parse(pubDate.asText(), DateTimeFormatter.RFC_1123_DATE_TIME)).orElse(LocalDateTime.now()))
                     .build();
-                if (currDto.refLink().contains("news.naver.com")) {
+                if (naverOnly) {
+                    if (currDto.refLink().contains("news.naver.com")) {
+                        retList.add(currDto);
+                    }
+                } else {
                     retList.add(currDto);
                 }
             });
