@@ -19,13 +19,13 @@ public class StockInfoController {
         this.stockPriceService = stockPriceService;
     }
 
-    @GetMapping("/api/stock-price/by-name")
+    @GetMapping("/api/v1/stock-price/by-name")
     public ResponseEntity<ResponseDto<List<StockItem>>> getStockItemsByName(@RequestParam(name = "name") String name, @RequestParam(name = "count") int count) {
         ResponseDto<List<StockItem>> responseDto = stockPriceService.getStockPriceByName(name, count);        
         return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto);
     }
 
-    @GetMapping("/api/stock-price/by-isin")
+    @GetMapping("/api/v1/stock-price/by-isin")
     public ResponseEntity<ResponseDto<List<StockItem>>> getStockItemsByIsin(@RequestParam(name = "isin") String isin, @RequestParam(name = "count") int count) {
         ResponseDto<List<StockItem>> responseDto = stockPriceService.getStockPriceByName(isin, count);        
         return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto);
