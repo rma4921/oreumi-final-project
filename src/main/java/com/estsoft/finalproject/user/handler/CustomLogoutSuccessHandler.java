@@ -62,7 +62,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         }
 
         log.info("Spring Security 로그아웃 처리 완료 - 쿠키 제거 및 토큰 정리");
-        response.sendRedirect("/custom-login?logout");
+        response.sendRedirect("/login?logout");
     }
 
     private String extractCookie(HttpServletRequest request, String name) {

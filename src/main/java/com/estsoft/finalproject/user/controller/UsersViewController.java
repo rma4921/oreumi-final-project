@@ -13,10 +13,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class UsersViewController {
-    // 로그인 테스트용
-    @GetMapping("/custom-login")
+    @GetMapping("/login")
     public String loginPage() {
         return "login";
+    }
+
+    // 로그인 테스트용
+    @GetMapping("/custom-login")
+    public String loginTestPage() {
+        return "UserTestTemplates/custom-login";
     }
 
     // 로그인 성공 테스트용
@@ -43,11 +48,11 @@ public class UsersViewController {
             model.addAttribute("provider", "알 수 없음");
         }
 
-        return "loginSuccessTest";
+        return "UserTestTemplates/loginSuccessTest";
     }
 
     @GetMapping("/another-page")
     public String anotherPage() {
-        return "another-page";  // templates/another-page.html을 반환
+        return "UserTestTemplates/another-page";  // templates/another-page.html을 반환
     }
 }

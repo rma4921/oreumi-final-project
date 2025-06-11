@@ -17,6 +17,6 @@ public class CustomOAuth2FailureHandler implements AuthenticationFailureHandler 
                                         AuthenticationException exception) throws IOException {
         log.info("OAuth2 로그인 실패 : {}", exception.getMessage());
 
-        response.sendRedirect("/custom-login?error=true");
+        response.sendRedirect("/login?error=true");
     }
 }

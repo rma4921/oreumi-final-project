@@ -96,7 +96,7 @@
         // Axios로 POST 요청 (쿠키 포함)
         window.apiClient.post('/logout')
             .then(() => {
-                window.location.href = '/custom-login';  // 로그아웃 후 로그인 페이지로 이동
+                window.location.href = '/login';  // 로그아웃 후 로그인 페이지로 이동
             })
             .catch(() => {
                 alert('로그아웃 실패');
