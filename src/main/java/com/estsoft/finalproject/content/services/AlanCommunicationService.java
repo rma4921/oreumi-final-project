@@ -232,8 +232,6 @@ public class AlanCommunicationService {
                 ia = ia.substring(startJson, endJson + 1);
             }
             Map<String, String> companyList = new LinkedHashMap<>();
-            logger.info(companyListBuilder.toString());
-            logger.info(ia);
             Optional.ofNullable(mapper.readTree(ia)).ifPresent(x -> x.forEach(y -> {
                 String cName = Optional.ofNullable(y.get("company_name")).map(JsonNode::asText).orElse("null");
                 String cAdvise = Optional.ofNullable(y.get("advice")).map(JsonNode::asText).orElse("null");
