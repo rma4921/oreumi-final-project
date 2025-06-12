@@ -14,7 +14,7 @@ import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.service.RelatedStockService;
 import com.estsoft.finalproject.mypage.service.ScrappedArticleService;
 import com.estsoft.finalproject.security.UserDetail;
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +56,7 @@ class MyPageControllerTest {
     @BeforeEach
     public void setUpUser() {
         model = new ConcurrentModel();
-        User mockUser = new User();
+        Users mockUser = new Users();
         mockUser.updateId(1L);
         mockUser.updateNickname("테스트유저1");
         userDetail = new UserDetail(mockUser);

@@ -1,7 +1,7 @@
 package com.estsoft.finalproject.comment.domain;
 
 import com.estsoft.finalproject.Post.domain.ScrapPost;
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -37,7 +37,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)

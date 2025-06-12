@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.estsoft.finalproject.Post.domain.ScrapPost;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
-import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
+import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class ScrapPostRepositoryTest {
     private ScrappedArticleRepository scrappedArticleRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UsersRepository userRepository;
 
     @Autowired
     private ScrapPostRepository scrapPostRepository;
@@ -31,7 +31,7 @@ class ScrapPostRepositoryTest {
     @Test
     @DisplayName("스크랩한 존재 유무 테스트")
     void existsByScrappedArticle_ScrapId() {
-        User tester = new User();
+        Users tester = new Users();
         tester.updateNickname("tester");
         userRepository.save(tester);
 

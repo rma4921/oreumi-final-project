@@ -1,7 +1,7 @@
 package com.estsoft.finalproject.mypage.domain;
 
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -36,7 +36,7 @@ public class ScrappedArticle {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users user;
 
     @CreatedDate
     @Column(nullable = false)

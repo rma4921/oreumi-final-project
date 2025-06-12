@@ -10,7 +10,7 @@ import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +38,13 @@ class ScrappedArticleServiceTest {
     @Mock
     private ScrapPostRepository scrapPostRepository;
 
-    private User tester;
+    private Users tester;
 
     private ScrappedArticle article;
 
     @BeforeEach
     public void setUp() {
-        tester = new User();
+        tester = new Users();
         tester.updateNickname("tester");
 
         article = ScrappedArticle.builder()

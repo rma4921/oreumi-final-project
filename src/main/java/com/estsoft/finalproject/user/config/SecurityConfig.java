@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user", "/loginSuccessTest").authenticated() // 인증 된 사용자만 접근 가능
+                    .requestMatchers("/mypage/**", "/api/mypage/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2

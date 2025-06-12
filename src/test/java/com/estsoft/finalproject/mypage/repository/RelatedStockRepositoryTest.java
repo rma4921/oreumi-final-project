@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.estsoft.finalproject.mypage.domain.RelatedStock;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
-import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
+import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ class RelatedStockRepositoryTest {
     private ScrappedArticleRepository scrappedArticleRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UsersRepository userRepository;
 
     @BeforeEach
     public void setUp() {
@@ -36,7 +36,7 @@ class RelatedStockRepositoryTest {
     @Test
     @DisplayName("scrapId의 관련 주식 가져오기 테스트")
     void findByScrappedArticle_ScrapId() {
-        User tester = new User();
+        Users tester = new Users();
         tester.updateNickname("tester");
         userRepository.save(tester);
 

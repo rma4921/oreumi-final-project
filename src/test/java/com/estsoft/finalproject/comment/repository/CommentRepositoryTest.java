@@ -7,8 +7,8 @@ import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.comment.domain.Comment;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
-import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
+import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +28,7 @@ class CommentRepositoryTest {
     private CommentRepository commentRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UsersRepository userRepository;
 
     @Autowired
     private ScrapPostRepository scrapPostRepository;
@@ -36,7 +36,7 @@ class CommentRepositoryTest {
     @Autowired
     private ScrappedArticleRepository scrappedArticleRepository;
 
-    private User user;
+    private Users user;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +45,7 @@ class CommentRepositoryTest {
         scrappedArticleRepository.deleteAll();
         commentRepository.deleteAll();
 
-        user = new User();
+        user = new Users();
         user.updateNickname("테스터");
         userRepository.save(user);
 

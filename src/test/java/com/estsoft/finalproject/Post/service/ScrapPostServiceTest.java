@@ -3,7 +3,6 @@ package com.estsoft.finalproject.Post.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,8 +10,7 @@ import static org.mockito.Mockito.when;
 import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
-import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
+import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 
 @ExtendWith(MockitoExtension.class)
 class ScrapPostServiceTest {
@@ -40,11 +35,11 @@ class ScrapPostServiceTest {
 
     private ScrappedArticle article;
 
-    private User tester;
+    private Users tester;
 
     @BeforeEach
     public void setUp() {
-        tester = new User();
+        tester = new Users();
         tester.updateId(1L);
 
         article = ScrappedArticle.builder()
@@ -117,7 +112,7 @@ class ScrapPostServiceTest {
     @DisplayName("본인 소유 아닌 스크랩 기사 공유 시 테스트")
     void savePostNotExistUser() {
         Long scrapId = article.getScrapId();
-        User tester2 = new User();
+        Users tester2 = new Users();
         tester2.updateId(2L);
 
         when(scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId))

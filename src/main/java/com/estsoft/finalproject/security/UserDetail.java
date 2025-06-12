@@ -1,6 +1,6 @@
 package com.estsoft.finalproject.security;
 
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import java.util.Collection;
 import java.util.Collections;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @RequiredArgsConstructor
 public class UserDetail implements UserDetails {
 
-    private final User user;
+    private final Users user;
     // 테스트용 하드 코딩
     private final String password = new BCryptPasswordEncoder().encode("1234");
 
@@ -24,8 +24,7 @@ public class UserDetail implements UserDetails {
 
     @Override
     public String getUsername() {
-        // return user.getNickname();
-        return "테스트유저1"; // 하드 코딩
+        return user.getNickname();
     }
 
     @Override

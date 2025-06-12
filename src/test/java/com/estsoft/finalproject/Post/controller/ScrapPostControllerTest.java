@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import com.estsoft.finalproject.Post.service.ScrapPostService;
 import com.estsoft.finalproject.security.UserDetail;
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +27,7 @@ class ScrapPostControllerTest {
     @DisplayName("스크랩한 기사 저장")
     void savePost() throws Exception {
         Long scrapId = 1L;
-        User user = new User();
+        Users user = new Users();
         user.updateId(1L);
         UserDetail userDetail = new UserDetail(user);
 

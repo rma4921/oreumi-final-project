@@ -10,7 +10,7 @@ import com.estsoft.finalproject.comment.domain.Comment;
 import com.estsoft.finalproject.comment.dto.CommentResponseDto;
 import com.estsoft.finalproject.comment.repository.CommentRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,13 +34,13 @@ class CommentServiceTest {
     @Mock
     private CommentRepository commentRepository;
 
-    private User user;
+    private Users user;
 
     private Comment comment;
 
     @BeforeEach
     void setUp() {
-        user = new User();
+        user = new Users();
         user.updateNickname("테스터");
 
         ScrappedArticle article = ScrappedArticle.builder()

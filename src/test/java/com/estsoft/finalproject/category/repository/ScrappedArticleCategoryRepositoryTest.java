@@ -6,8 +6,8 @@ import com.estsoft.finalproject.category.domain.Category;
 import com.estsoft.finalproject.category.domain.ScrappedArticleCategory;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
-import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
+import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +31,9 @@ class ScrappedArticleCategoryRepositoryTest {
     private CategoryRepository categoryRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UsersRepository userRepository;
 
-    private User tester;
+    private Users tester;
 
     private ScrappedArticle article;
 
@@ -46,7 +46,7 @@ class ScrappedArticleCategoryRepositoryTest {
         categoryRepository.deleteAll();
         userRepository.deleteAll();
 
-        tester = new User();
+        tester = new Users();
         tester.updateNickname("tester");
         userRepository.save(tester);
 

@@ -14,7 +14,7 @@ import com.estsoft.finalproject.category.repository.CategoryRepository;
 import com.estsoft.finalproject.category.repository.ScrappedArticleCategoryRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
-import com.estsoft.finalproject.user.User;
+import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ class CategoryServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
-    private User tester;
+    private Users tester;
 
     private ScrappedArticle article;
 
@@ -49,7 +49,7 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        tester = new User();
+        tester = new Users();
         tester.updateNickname("tester");
 
         article = ScrappedArticle.builder()

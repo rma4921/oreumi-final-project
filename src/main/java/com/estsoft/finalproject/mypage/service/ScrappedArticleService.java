@@ -3,9 +3,9 @@ package com.estsoft.finalproject.mypage.service;
 import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
-import com.estsoft.finalproject.user.User;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
+import com.estsoft.finalproject.user.domain.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class ScrappedArticleService {
     private final ScrappedArticleRepository scrappedArticleRepository;
     private final ScrapPostRepository scrapPostRepository;
 
-    public Page<ScrappedArticleResponseDto> getScrappedArticlesByUser(User user,
+    public Page<ScrappedArticleResponseDto> getScrappedArticlesByUser(Users user,
         Pageable pageable) {
         return scrappedArticleRepository.findAllByUserOrderByScrapDateDesc(user, pageable)
             .map(scrappedArticle -> scrappedArticle.toDto(
@@ -29,7 +29,7 @@ public class ScrappedArticleService {
             ));
     }
 
-    public Page<ScrappedArticleResponseDto> getScrappedArticlesByUserAndTitle(User user,
+    public Page<ScrappedArticleResponseDto> getScrappedArticlesByUserAndTitle(Users user,
         String keyword, Pageable pageable) {
         return scrappedArticleRepository.findByUserAndTitleContainingOrderByScrapDateDesc(user,
                 keyword, pageable)

@@ -3,8 +3,8 @@ package com.estsoft.finalproject.mypage.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
-import com.estsoft.finalproject.user.User;
-import com.estsoft.finalproject.user.UserRepository;
+import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +24,11 @@ class ScrappedArticleRepositoryTest {
     private ScrappedArticleRepository scrappedArticleRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UsersRepository userRepository;
 
-    private User tester;
+    private Users tester;
 
-    private User tester2;
+    private Users tester2;
 
     private ScrappedArticle article;
 
@@ -37,10 +37,10 @@ class ScrappedArticleRepositoryTest {
         userRepository.deleteAll();
         scrappedArticleRepository.deleteAll();
 
-        tester = new User();
+        tester = new Users();
         tester.updateNickname("tester");
 
-        tester2 = new User();
+        tester2 = new Users();
         tester2.updateNickname("tester2");
 
         userRepository.save(tester);
@@ -100,7 +100,7 @@ class ScrappedArticleRepositoryTest {
         ScrappedArticle result = scrappedArticleRepository.findById(article.getScrapId())
             .orElseThrow();
 
-        assertThat(result.getUser().getId()).isEqualTo(tester2.getId());
+        assertThat(result.getUser().getUserId()).isEqualTo(tester2.getUserId());
         assertThat(result.getTitle()).isEqualTo("3번째 테스트 중입니다.");
         assertThat(result.getLink()).isEqualTo("https://www.naver.com");
         assertThat(result.getDescription()).isEqualTo("3번째 테스트용 더미데이터입니다.");
