@@ -25,9 +25,10 @@ GET http://localhost:8080/api/v1/briefing/latest
 #    "link": "기사 링크 (네이버 뉴스)",
 #    "topic": "기사의 간략한 주제",
 #    "category": "AI가 파악한 기사의 분류",
-#    "relatedCompanies": [
-#      "해당 기사와 관련된 회사들 (공식 상장명)"
-#    ]
+#    "timestamp": "기사 작성 시간",
+#    "relatedCompanies": {
+#      "해당 기사와 관련된 회사 (공식 상장명칭)": "간략한 투자 조언"
+#    }
 #  },
 #  "responseCode": "HTTP 응답 결과 (예: OK)",
 #  "message": "응답 메시지",

@@ -72,7 +72,7 @@ public class AlanCommunicationServiceTest {
     @Test
     public void testSummarizeArticle() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSummarizeArticle()");
-        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://www.donga.com/news/Politics/article/all/20250526/131671484/2");
+        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://n.news.naver.com/mnews/article/018/0006034594?sid=101");
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getContent()).isNotEmpty();
         logger.info("Question is: " + res.getQuestion());
@@ -84,7 +84,7 @@ public class AlanCommunicationServiceTest {
     @Test
     public void testGetContentsForAPage() throws Exception {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testGetContentsForAPage()");
-        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://www.donga.com/news/Politics/article/all/20250526/131671484/2");
+        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://n.news.naver.com/mnews/article/018/0006034594?sid=101");
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         String r = res.getContent();
         Assertions.assertThat(r).isNotEmpty();
@@ -118,7 +118,7 @@ public class AlanCommunicationServiceTest {
     public void testSimpleAlanPromptBuilder() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilder()");
         AlanResponseDto res = alanCommunicationService.getResultFromAlan(SimpleAlanKoreanPromptBuilder.start().
-            addCommand("다음 기사 요약해줘: https://www.donga.com/news/Politics/article/all/20250526/131671484/2")
+            addCommand("다음 기사 요약해줘: https://n.news.naver.com/mnews/article/018/0006034594?sid=101")
             .setOutputFormat("{ \"title\" : (기사 제목), \"summary\" : (요약문) }")
             .addErrorHandler("다음과 같이 결과를 출력해줘: { \"title\" : \"오류\", \"summary\" : (오류 발생 이유) }")
             .buildPrompt());

@@ -6,16 +6,21 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec;
 
 import com.estsoft.finalproject.content.model.dto.AlanResponseDto;
 import com.estsoft.finalproject.content.model.dto.NewsDetailItem;
@@ -157,10 +162,35 @@ public class AlanCommunicationService {
         }
     }
 
+
+    public ResponseDto<LocalDateTime> getTimeInfoForArticle(String url) {
+        LocalDateTime errorItem = LocalDateTime.now();
+        ResponseSpec res = restClient.get().uri(URI.create(url))
+                .retrieve();
+        String r = res.body(String.class);
+        if (!r.contains("data-modify-date-time=\"")) {
+            return ResponseDto.builder(errorItem).message("News article's time data is not valid (no time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        String[] dateTimeSplit = r.split("data-modify-date-time=\"");
+        if (dateTimeSplit.length < 2) {
+            return ResponseDto.builder(errorItem).message("News article's time data is not valid (nothing after time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        if (!dateTimeSplit[1].contains("\"")) {
+            return ResponseDto.builder(errorItem).message("News article's time data is not valid (timestamp quotation not complete)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        String dateTimeString = dateTimeSplit[1].split("\"")[0];
+        LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return ResponseDto.builder(dateTime).message("Success").responseCode(HttpStatus.OK).build();
+    }
+
     public ResponseDto<NewsDetailItem> getNewsDetails(String articleUrl) {
+        ResponseDto<LocalDateTime> ts = getTimeInfoForArticle(articleUrl);
+        if (ts.getResponseCode() != HttpStatus.OK) {
+            logger.error("Failed to fetch time data for the article. The time data for the article " + articleUrl + " will not be valid");
+        }
         AlanResponseDto newsSearchItem = summarizeArticle(articleUrl);
         if (newsSearchItem.getResponseCode() != HttpStatus.OK) {
-            NewsDetailItem ret = NewsDetailItem.builder().headline("Invalid response due to an error").content("").category("").topic("").link(articleUrl).build();
+            NewsDetailItem ret = NewsDetailItem.builder().headline("Invalid response due to an error").content("").timestamp(ts.getItem()).category("").topic("").link(articleUrl).build();
             return ResponseDto.builder(ret).message("Invalid response due to an error").responseCode(newsSearchItem.getResponseCode()).build();
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -183,15 +213,38 @@ public class AlanCommunicationService {
                 category.equalsIgnoreCase("null") || 
                 companies.isEmpty() ||
                 topic.equalsIgnoreCase("null")) {
-                NewsDetailItem ret = NewsDetailItem.builder().headline("Malformed JSON. Failed to parse!").content(r).category("").topic("").link(articleUrl).build();
+                NewsDetailItem ret = NewsDetailItem.builder().headline("Malformed JSON. Failed to parse!").content(r).timestamp(ts.getItem()).category("").topic("").link(articleUrl).build();
                 return ResponseDto.builder(ret).message("Invalid response due to an error").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-            List<String> companyList = new ArrayList<>();
-            companies.get().forEach(x -> companyList.add(x.get("company_name").asText()));
-            NewsDetailItem ret = NewsDetailItem.builder().headline(headline).content(content).topic(topic).category(category).relatedCompanies(sanitizeCompanyList(companyList)).link(articleUrl).build();
+            List<String> origCompanyList = new ArrayList<>();
+            StringBuilder companyListBuilder = new StringBuilder();
+            companies.get().forEach(x -> origCompanyList.add(x.get("company_name").asText()));
+            sanitizeCompanyList(origCompanyList).forEach(x -> companyListBuilder.append("[" + x + "] "));
+            AlanResponseDto companyInvestmentAdvice = getResultFromAlan(SimpleAlanKoreanPromptBuilder.start().
+                addCommand("다음 주식 종목들에 대한 투자 조언을 해 줘.").
+                addContext("주식 종목들은 " + companyListBuilder.toString().trim()).
+                setOutputFormat("[{\"company_name\" : (주식 종목명), \"advice\" : (투자 조언)}]").
+                buildPrompt());
+            String ia = companyInvestmentAdvice.getContent();
+            if (!ia.startsWith("[") || !ia.endsWith("]")) {
+                int startJson = ia.indexOf('[');
+                int endJson = ia.lastIndexOf(']');
+                ia = ia.substring(startJson, endJson + 1);
+            }
+            Map<String, String> companyList = new LinkedHashMap<>();
+            logger.info(companyListBuilder.toString());
+            logger.info(ia);
+            Optional.ofNullable(mapper.readTree(ia)).ifPresent(x -> x.forEach(y -> {
+                String cName = Optional.ofNullable(y.get("company_name")).map(JsonNode::asText).orElse("null");
+                String cAdvise = Optional.ofNullable(y.get("advice")).map(JsonNode::asText).orElse("null");
+                if (!cName.equalsIgnoreCase("null") && !cAdvise.equalsIgnoreCase("null")) {
+                    companyList.put(cName, cAdvise);
+                }
+            }));
+            NewsDetailItem ret = NewsDetailItem.builder().headline(headline).content(content).topic(topic).category(category).timestamp(ts.getItem()).relatedCompanies(Collections.unmodifiableMap(companyList)).link(articleUrl).build();
             return ResponseDto.builder(ret).message("Successfully summarized the article with details.").responseCode(HttpStatus.OK).build();
         } catch (JsonProcessingException jex) {
-            NewsDetailItem ret = NewsDetailItem.builder().headline("Malformed JSON. Failed to parse!").content(r).category("").topic("").link(articleUrl).build();
+            NewsDetailItem ret = NewsDetailItem.builder().headline("Malformed JSON. Failed to parse!").timestamp(ts.getItem()).content(r).category("").topic("").link(articleUrl).build();
             return ResponseDto.builder(ret).message("Invalid response due to an error").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
