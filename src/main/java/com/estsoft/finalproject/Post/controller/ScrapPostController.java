@@ -1,7 +1,7 @@
 package com.estsoft.finalproject.Post.controller;
 
 import com.estsoft.finalproject.Post.service.ScrapPostService;
-import com.estsoft.finalproject.security.UserDetail;
+import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -16,7 +16,7 @@ public class ScrapPostController {
 
     @PostMapping("/api/mypage/{scrapId}")
     public String saveScrapPost(@PathVariable Long scrapId,
-        @AuthenticationPrincipal UserDetail userDetail) {
+        @AuthenticationPrincipal CustomUsersDetails userDetail) {
 
         scrapPostService.savePost(scrapId, userDetail.getUser());
 

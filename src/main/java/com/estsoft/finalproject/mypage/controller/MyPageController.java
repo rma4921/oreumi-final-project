@@ -8,8 +8,8 @@ import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.service.RelatedStockService;
 import com.estsoft.finalproject.mypage.service.ScrappedArticleService;
-import com.estsoft.finalproject.security.UserDetail;
 import com.estsoft.finalproject.category.service.CategoryService;
+import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class MyPageController {
 
     @GetMapping("/mypage")
     public String getScrappedArticles(
-        @AuthenticationPrincipal UserDetail userDetail,
+        @AuthenticationPrincipal CustomUsersDetails userDetail,
         @RequestParam(defaultValue = "0") int scrapPage,
         @RequestParam(defaultValue = "scrap") String tab,
         @RequestParam(defaultValue = "0") int commentPage,
@@ -56,9 +56,9 @@ public class MyPageController {
             Page<ScrappedArticleResponseDto> page;
 
             if (keyword == null || keyword.trim().isEmpty()) {
-                page = scrappedArticleService.getScrappedArticlesByUser(userDetail.getUser(), pageable);
+                page = scrappedArticleService.getScrappedArticlesByUser(userDetail.getUsers(), pageable);
             } else {
-                page = scrappedArticleService.getScrappedArticlesByUserAndTitle(userDetail.getUser(),
+                page = scrappedArticleService.getScrappedArticlesByUserAndTitle(userDetail.getUsers(),
                     keyword, pageable);
             }
             currentPage = page.getNumber();
@@ -88,9 +88,9 @@ public class MyPageController {
             Page<CommentResponseDto> page;
 
             if (keyword == null || keyword.trim().isEmpty()) {
-                page = commentService.getCommentsByUser(userDetail.getUser(), pageable);
+                page = commentService.getCommentsByUser(userDetail.getUsers(), pageable);
             } else {
-                page = commentService.findByUserAndContentContaining(userDetail.getUser(),
+                page = commentService.findByUserAndContentContaining(userDetail.getUsers(),
                     keyword, pageable);
             }
             currentPage = page.getNumber();
@@ -133,12 +133,6 @@ public class MyPageController {
 
         return "layout/mypage/detail";
     }
-
-    @GetMapping("/login")
-    public String loginPage() {
-        return "/layout/login/login";
-    }
-
 }
 
 

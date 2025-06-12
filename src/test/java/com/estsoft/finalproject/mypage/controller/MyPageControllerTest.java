@@ -13,8 +13,8 @@ import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.service.RelatedStockService;
 import com.estsoft.finalproject.mypage.service.ScrappedArticleService;
-import com.estsoft.finalproject.security.UserDetail;
 import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +50,7 @@ class MyPageControllerTest {
 
     private Model model;
 
-    private UserDetail userDetail;
+    private CustomUsersDetails userDetail;
 
     // 동엽님 코드에 따라 수정해야 함.
     @BeforeEach
@@ -59,7 +59,7 @@ class MyPageControllerTest {
         Users mockUser = new Users();
         mockUser.updateId(1L);
         mockUser.updateNickname("테스트유저1");
-        userDetail = new UserDetail(mockUser);
+        userDetail = new CustomUsersDetails(mockUser);
     }
 
     @Test

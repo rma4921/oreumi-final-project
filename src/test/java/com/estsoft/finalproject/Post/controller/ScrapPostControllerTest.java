@@ -5,8 +5,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.estsoft.finalproject.Post.service.ScrapPostService;
-import com.estsoft.finalproject.security.UserDetail;
 import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,7 @@ class ScrapPostControllerTest {
         Long scrapId = 1L;
         Users user = new Users();
         user.updateId(1L);
-        UserDetail userDetail = new UserDetail(user);
+        CustomUsersDetails userDetail = new CustomUsersDetails(user);
 
         String result = scrapPostController.saveScrapPost(scrapId, userDetail);
 
