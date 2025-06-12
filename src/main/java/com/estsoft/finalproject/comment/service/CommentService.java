@@ -25,14 +25,12 @@ public class CommentService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        String nickname = userRepository.findById(request.getUserId())
-                .map(User::getNickname)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 못 찾았습니다."));
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
         Comment comment = Comment.builder()
                 .postId(request.getPostId())
-                .userId(request.getUserId())
-                .nickname(nickname)
+                .user(user)
                 .content(request.getContent())
                 .createTime(now)
                 .updateTime(now)
