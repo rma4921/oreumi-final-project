@@ -111,7 +111,7 @@ public class LoginTest {
         failureHandler.onAuthenticationFailure(request, response, exception);
 
         // then
-        verify(response).sendRedirect("/custom-login?error=true");
+        verify(response).sendRedirect("/login?error=true");
     }
 
     @Test

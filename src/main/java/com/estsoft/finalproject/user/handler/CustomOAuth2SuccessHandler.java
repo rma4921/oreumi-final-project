@@ -53,6 +53,17 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         usersRepository.findByProviderAndEmail(provider, email).ifPresent(user -> {
             user.setRefreshToken(refreshToken);
+
+            // 닉네임이 없으면 자동 생성
+            if (user.getNickname() == null || user.getNickname().isBlank()) {
+                String nickname;
+                do {
+                    nickname = generateRandomNickname();
+                } while (usersRepository.existsByNickname(nickname));
+                user.setNickname(nickname);
+                log.info("랜덤 닉네임 설정됨: {}", nickname);
+            }
+
             usersRepository.save(user);
             log.info("리프레시 토큰 DB 저장 완료");
         });
@@ -67,5 +78,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         // 로그인 후 리디렉션 -> mainpage 로 이동할 수 있도록
         response.sendRedirect("/loginSuccessTest");
+    }
+
+    private String generateRandomNickname() {
+        String random = java.util.UUID.randomUUID().toString().substring(0, 6);
+        return "user_" + random;
     }
 }

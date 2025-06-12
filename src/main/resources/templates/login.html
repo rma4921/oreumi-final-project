@@ -19,11 +19,10 @@
                 <a href="/login" class="login-button">로그인</a>
             </div>
             <div th:if="${#authentication.principal != 'anonymousUser'}">
-                <span class="user-nickname" th:text="${#authentication.name}">닉네임</span>
+                <span class="user-nickname" th:text="${nickname}">닉네임</span>
                 <a href="/logout" class="login-button logout-button">로그아웃</a>
             </div>
         </div>
-
     </nav>
 
     <!-- 가로 구분선 -->

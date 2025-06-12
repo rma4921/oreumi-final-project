@@ -1,6 +1,7 @@
 package com.estsoft.finalproject.user.controller;
 
 import com.estsoft.finalproject.user.dto.CustomUsersDetails;
+import com.estsoft.finalproject.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,8 +14,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class UsersViewController {
+    private final UsersService usersService;
+
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(Authentication authentication, Model model) {
+        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
+            if (authentication.getPrincipal() instanceof CustomUsersDetails userDetails) {
+                String nickname = usersService.getOrCreateNickname(userDetails.getUsers().getProvider(), userDetails.getUsername());
+                model.addAttribute("nickname", nickname);
+            }
+        }
         return "login";
     }
 
