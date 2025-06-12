@@ -23,11 +23,9 @@ public class Comment {
     @Column(name = "comment_id")
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "nickname", nullable = false)
-    private String nickname;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable =false)
+    private User user;
 
     @Column(name = "post_id", nullable = false)
     private Long postId;
