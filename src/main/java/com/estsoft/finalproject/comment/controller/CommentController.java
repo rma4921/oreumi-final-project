@@ -22,14 +22,14 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommentResponse> save(@RequestBody CommentRequest request) {
         Comment comment = commentService.save(request);
-        return ResponseEntity.ok(new CommentResponse(comment, comment.getNickname()));
+        return ResponseEntity.ok(new CommentResponse(comment));
     }
 
     @GetMapping("/post/{postId}")
     public ResponseEntity<List<CommentResponse>> findByPostId(@PathVariable Long postId) {
         List<Comment> comments = commentService.findByPostId(postId);
         List<CommentResponse> response = comments.stream()
-                .map(comment -> new CommentResponse(comment, comment.getNickname()))
+                .map(CommentResponse::new)
                 .toList();
         return ResponseEntity.ok(response);
     }
@@ -56,14 +56,14 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long commentId, @RequestBody CommentRequest request) {
         Comment comment = commentService.updateComment(commentId, request);
-        return ResponseEntity.ok(new CommentResponse(comment, comment.getNickname()));
+        return ResponseEntity.ok(new CommentResponse(comment));
     }
 
     @GetMapping("/user/{userId}") // 유저가 작성한 댓글 불러오기
     public ResponseEntity<List<CommentResponse>> findCommentByUserId(@PathVariable Long userId) {
         List<Comment> comments = commentService.findByUserId(userId);
         List<CommentResponse> response = comments.stream()
-                .map(comment -> new CommentResponse(comment, comment. getNickname()))
+                .map(CommentResponse::new)
                 .toList();
         return ResponseEntity.ok(response);
     }
