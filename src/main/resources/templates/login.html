@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 페이지</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+
+    <!-- 내비게이션 바 -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="/" class="navbar-logo">프로젝트 로고</a>
+            <a href="/news" class="navbar-button">뉴스 찾아보기</a>
+            <a href="/board" class="navbar-button">소통 게시판</a>
+        </div>
+        <div class="navbar-right">
+            <div th:if="${#authentication.principal == 'anonymousUser'}">
+                <a href="/login" class="login-button">로그인</a>
+            </div>
+            <div th:if="${#authentication.principal != 'anonymousUser'}">
+                <span class="user-nickname" th:text="${nickname}">닉네임</span>
+                <a href="/logout" class="login-button logout-button">로그아웃</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 가로 구분선 -->
+    <div class="separate-line"></div>
+
+    <!-- 로그인 박스 -->
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-logo">투브리핑</div>
+
+            <div class="login-content">
+                <h2>소셜 로그인</h2>
+                <a href="/oauth2/authorization/google" class="social-login-button google">Google</a>
+                <a href="/oauth2/authorization/naver" class="social-login-button naver">Naver</a>
+                <a href="/oauth2/authorization/kakao" class="social-login-button kakao">Kakao</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
