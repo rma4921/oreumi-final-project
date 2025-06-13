@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>상세 보기</title>
     <link href="/css/mypage/detail.css" rel="stylesheet">
+    <link href="/css/fregment/body.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -19,7 +20,7 @@
 
         <a class="move-button"
            th:if="${scrappedArticle.isShared()}"
-           th:href="@{'#' + ${scrappedArticle.scrapId}}"> <!--여기는 나중에 URL 확정되면 그때 수정하는 걸로-->
+           th:href="@{'/post/' + ${scrappedArticle.postId}}">
             게시글 이동
         </a>
 
