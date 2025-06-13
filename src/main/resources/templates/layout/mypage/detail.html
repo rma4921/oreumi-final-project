@@ -7,6 +7,8 @@
     <link href="/css/fregment/body.css" rel="stylesheet">
 </head>
 <body>
+<div th:replace="layout/header/header :: headerFragment"></div>
+
 <div class="container">
     <div class="title-row">
         <h3 class="article-title" th:text="${scrappedArticle.title}">기사 제목</h3>

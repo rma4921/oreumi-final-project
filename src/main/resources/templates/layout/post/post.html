@@ -8,6 +8,8 @@
     <link href="/css/fregment/search.css" rel="stylesheet">
 </head>
 <body>
+<div th:replace="layout/header/header :: headerFragment"></div>
+
 <form th:action="@{/post}" method="get" class="search-form">
     <input name="keyword" type="text" placeholder="제목으로 검색"
            th:value="${keyword} ?: ''" class="search-input"/>
