@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
@@ -168,10 +167,10 @@ public class AlanCommunicationService {
         ResponseSpec res = restClient.get().uri(URI.create(url))
                 .retrieve();
         String r = res.body(String.class);
-        if (!r.contains("data-modify-date-time=\"")) {
+        if (!r.contains("data-date-time=\"")) {
             return ResponseDto.builder(errorItem).message("News article's time data is not valid (no time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        String[] dateTimeSplit = r.split("data-modify-date-time=\"");
+        String[] dateTimeSplit = r.split("data-date-time=\"");
         if (dateTimeSplit.length < 2) {
             return ResponseDto.builder(errorItem).message("News article's time data is not valid (nothing after time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

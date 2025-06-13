@@ -113,10 +113,10 @@ public class WebSearchService {
                 .retrieve();
             String r = res.body(String.class);
             StringBuilder retBuilder = new StringBuilder();
-            if (!r.contains("data-modify-date-time=\"")) {
+            if (!r.contains("data-date-time=\"")) {
                 return ResponseDto.builder(errorItem).message("News article's time data is not valid (no time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-            String[] dateTimeSplit = r.split("data-modify-date-time=\"");
+            String[] dateTimeSplit = r.split("data-date-time=\"");
             if (dateTimeSplit.length < 2) {
                 return ResponseDto.builder(errorItem).message("News article's time data is not valid (nothing after time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
