@@ -1,0 +1,70 @@
+.header-box {
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    padding: 0.75rem 1rem;  /* padding 줄여서 크기 최적화 */
+    box-sizing: border-box; /* padding 포함해서 width 100% 유지 */
+    overflow-x: hidden;     /* 혹시 모를 오버플로 방지 */
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;        /* 화면 작으면 자동 줄바꿈 */
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;              /* gap 줄임 */
+    flex-wrap: wrap;        /* 메뉴 줄바꿈 대응 */
+    min-width: 0;           /* flex item 줄어들기 허용 */
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.site-title {
+    background-color: #73EB77;
+    padding: 0.4rem 0.8rem;
+    font-weight: bold;
+    color: black;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+.nav-link {
+    font-weight: bold;
+    color: #212529;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+.auth-box {
+    background-color: #73EB77;
+    padding: 0.4rem 0.8rem;
+    font-weight: bold;
+    color: black;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+}
+
+.auth-link {
+    color: black;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
