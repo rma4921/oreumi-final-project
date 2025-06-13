@@ -31,8 +31,11 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
 
+    - name: Print active profiles
+      run: echo "SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE"
+
     - name: Build with Gradle Wrapper
-      run: ./gradlew build --stacktrace --info
+      run: ./gradlew build
 
     - name: Make zip file
       run: zip -r ./$GITHUB_SHA.zip .
