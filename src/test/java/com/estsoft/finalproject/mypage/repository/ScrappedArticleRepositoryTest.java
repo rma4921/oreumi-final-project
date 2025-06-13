@@ -3,6 +3,7 @@ package com.estsoft.finalproject.mypage.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
@@ -37,11 +38,8 @@ class ScrappedArticleRepositoryTest {
         userRepository.deleteAll();
         scrappedArticleRepository.deleteAll();
 
-        tester = new Users();
-        tester.updateNickname("tester");
-
-        tester2 = new Users();
-        tester2.updateNickname("tester2");
+        tester = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
+        tester2 = new Users("구글", "tester@gmail.com", "tester2", Role.ROLE_USER);
 
         userRepository.save(tester);
         userRepository.save(tester2);

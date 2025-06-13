@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.estsoft.finalproject.mypage.domain.RelatedStock;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
@@ -36,8 +37,8 @@ class RelatedStockRepositoryTest {
     @Test
     @DisplayName("scrapId의 관련 주식 가져오기 테스트")
     void findByScrappedArticle_ScrapId() {
-        Users tester = new Users();
-        tester.updateNickname("tester");
+        Users tester = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
+
         userRepository.save(tester);
 
         ScrappedArticle article = ScrappedArticle.builder()

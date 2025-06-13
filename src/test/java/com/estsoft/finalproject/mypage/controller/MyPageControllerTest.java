@@ -13,6 +13,7 @@ import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.service.RelatedStockService;
 import com.estsoft.finalproject.mypage.service.ScrappedArticleService;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import java.time.LocalDateTime;
@@ -56,9 +57,8 @@ class MyPageControllerTest {
     @BeforeEach
     public void setUpUser() {
         model = new ConcurrentModel();
-        Users mockUser = new Users();
-        mockUser.updateId(1L);
-        mockUser.updateNickname("테스트유저1");
+        Users mockUser = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
+
         userDetail = new CustomUsersDetails(mockUser);
     }
 
@@ -118,7 +118,7 @@ class MyPageControllerTest {
         Long scrapId = 1L;
 
         List<CommentResponseDto> comment = List.of(
-            new CommentResponseDto(1L, scrapId, "제목입니다.","댓글입니다.", LocalDateTime.now())
+            new CommentResponseDto(1L, scrapId, 1L, "제목입니다.","댓글입니다.", LocalDateTime.now())
         );
         Page<CommentResponseDto> page = new PageImpl<>(comment, PageRequest.of(0, 10), 1);
 
@@ -138,9 +138,10 @@ class MyPageControllerTest {
     @DisplayName("메인 페이지 검색 화면 테스트 - 댓글 탭")
     public void getScrappedArticles_WithKeyWord_Comment() throws Exception {
         Long scrapId = 1L;
+        Long postId = 1L;
 
         List<CommentResponseDto> comment = List.of(
-            new CommentResponseDto(1L, scrapId, "제목입니다.","댓글입니다.", LocalDateTime.now())
+            new CommentResponseDto(1L, scrapId, 1L, "제목입니다.","댓글입니다.", LocalDateTime.now())
         );
         Page<CommentResponseDto> page = new PageImpl<>(comment, PageRequest.of(0, 10), 1);
 
@@ -161,10 +162,11 @@ class MyPageControllerTest {
     @DisplayName("게시글 상세 보기 테스트")
     public void getScrappedArticleDetail() throws Exception {
         Long scrapId = 1L;
+        Long postId = 1L;
 
         ScrappedArticleDetailResponseDto article =
             new ScrappedArticleDetailResponseDto(
-                scrapId, "Test 중입니다.", "test", LocalDateTime.now(),
+                scrapId, postId, "Test 중입니다.", "test", LocalDateTime.now(),
                 "요약", "https://www.naver.com", LocalDateTime.now(),
                 false
             );

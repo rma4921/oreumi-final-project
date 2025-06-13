@@ -5,11 +5,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.estsoft.finalproject.Post.domain.ScrapPost;
 import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleDetailResponseDto;
 import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,8 +46,7 @@ class ScrappedArticleServiceTest {
 
     @BeforeEach
     public void setUp() {
-        tester = new Users();
-        tester.updateNickname("tester");
+        tester = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
 
         article = ScrappedArticle.builder()
             .scrapId(1L)
@@ -98,11 +99,14 @@ class ScrappedArticleServiceTest {
     @DisplayName("스크랩한 기사 상세보기 테스트")
     void getScrappedArticleDetail() {
         Long scrapId = article.getScrapId();
+        ScrapPost scrapPost = new ScrapPost(article);
 
         when(scrappedArticleRepository.findById(scrapId))
             .thenReturn(Optional.of(article));
         when(scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId))
             .thenReturn(true);
+        when(scrapPostRepository.findByScrappedArticle(article))
+            .thenReturn(scrapPost);
 
         ScrappedArticleDetailResponseDto result = scrappedArticleService
             .getScrappedArticleDetail(scrapId);

@@ -7,6 +7,7 @@ import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.comment.domain.Comment;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
@@ -45,8 +46,8 @@ class CommentRepositoryTest {
         scrappedArticleRepository.deleteAll();
         commentRepository.deleteAll();
 
-        user = new Users();
-        user.updateNickname("테스터");
+        user = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
+
         userRepository.save(user);
 
         ScrappedArticle article = ScrappedArticle.builder()
@@ -87,9 +88,9 @@ class CommentRepositoryTest {
 
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent().get(0).getContent()).isEqualTo("댓글이당.");
-        assertThat(page.getContent().get(0).getUser().getNickname()).isEqualTo("테스터");
+        assertThat(page.getContent().get(0).getUser().getNickname()).isEqualTo("tester");
         assertThat(page.getContent().get(1).getContent()).isEqualTo("두 번째 댓글이당.");
-        assertThat(page.getContent().get(1).getUser().getNickname()).isEqualTo("테스터");
+        assertThat(page.getContent().get(1).getUser().getNickname()).isEqualTo("tester");
     }
 
     @Test
@@ -101,6 +102,6 @@ class CommentRepositoryTest {
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent().get(0).getContent()).isEqualTo("두 번째 댓글이당.");
-        assertThat(page.getContent().get(0).getUser().getNickname()).isEqualTo("테스터");
+        assertThat(page.getContent().get(0).getUser().getNickname()).isEqualTo("tester");
     }
 }

@@ -6,6 +6,7 @@ import com.estsoft.finalproject.category.domain.Category;
 import com.estsoft.finalproject.category.domain.ScrappedArticleCategory;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.repository.UsersRepository;
 import java.time.LocalDateTime;
@@ -46,8 +47,7 @@ class ScrappedArticleCategoryRepositoryTest {
         categoryRepository.deleteAll();
         userRepository.deleteAll();
 
-        tester = new Users();
-        tester.updateNickname("tester");
+        tester = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
         userRepository.save(tester);
 
         article = ScrappedArticle.builder()

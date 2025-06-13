@@ -14,6 +14,7 @@ import com.estsoft.finalproject.category.repository.CategoryRepository;
 import com.estsoft.finalproject.category.repository.ScrappedArticleCategoryRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,8 +50,7 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        tester = new Users();
-        tester.updateNickname("tester");
+        tester = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
 
         article = ScrappedArticle.builder()
             .user(tester)

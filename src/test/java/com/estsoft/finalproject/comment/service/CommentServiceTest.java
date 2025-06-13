@@ -10,6 +10,7 @@ import com.estsoft.finalproject.comment.domain.Comment;
 import com.estsoft.finalproject.comment.dto.CommentResponseDto;
 import com.estsoft.finalproject.comment.repository.CommentRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
+import com.estsoft.finalproject.user.domain.Role;
 import com.estsoft.finalproject.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,8 +41,7 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new Users();
-        user.updateNickname("테스터");
+        user = new Users("네이버", "tester@naver.com", "tester", Role.ROLE_USER);
 
         ScrappedArticle article = ScrappedArticle.builder()
             .user(user)
