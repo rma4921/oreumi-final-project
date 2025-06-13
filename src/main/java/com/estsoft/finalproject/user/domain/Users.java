@@ -56,11 +56,7 @@ public class Users {
         this.updatedDate = LocalDateTime.now();
     }
 
-    public void updateId(Long id) {
-        this.userId = id;
-    }
-
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
+    public void updateId(Long userId) {
+        this.userId = userId;
     }
 }
