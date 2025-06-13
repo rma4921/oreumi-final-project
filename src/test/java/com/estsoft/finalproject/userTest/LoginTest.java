@@ -28,10 +28,12 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class LoginTest {
 
