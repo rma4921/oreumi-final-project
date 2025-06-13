@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ "develop" ]
 
+env:
+  S3_BUCKET_NAME: oreumi-final-team1
+  AWS_REGION: ap-northeast-2
+
 jobs:
   build:
 
