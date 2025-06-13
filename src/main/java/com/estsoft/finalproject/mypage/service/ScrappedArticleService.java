@@ -45,17 +45,24 @@ public class ScrappedArticleService {
         ScrappedArticle article = scrappedArticleRepository.findById(scrapId)
             .orElseThrow(() -> new IllegalArgumentException("해당 스크랩이 없습니다. scrapId: " + scrapId));
         boolean isShared = scrapPostRepository.existsByScrappedArticle_ScrapId(scrapId);
+        Long postId = 0L;
 
-        return new ScrappedArticleDetailResponseDto(
-            article.getScrapId(),
-            article.getTitle(),
-            article.getTopic(),
-            article.getScrapDate(),
-            article.getDescription(),
-            article.getLink(),
-            article.getPubDate(),
-            isShared
-        );
+        if (isShared) {
+            postId = scrapPostRepository.findByScrappedArticle(article)
+                .getPostId();
+        }
+
+        return ScrappedArticleDetailResponseDto.builder()
+            .scrapId(article.getScrapId())
+            .postId(postId)
+            .title(article.getTitle())
+            .topic(article.getTopic())
+            .scrapDate(article.getScrapDate())
+            .description(article.getDescription())
+            .link(article.getLink())
+            .pubDate(article.getPubDate())
+            .isShared(isShared)
+            .build();
     }
 
     public void deleteScrappedArticle(Long scrapId) {

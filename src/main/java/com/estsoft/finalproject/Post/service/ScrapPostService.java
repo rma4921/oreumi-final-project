@@ -1,11 +1,14 @@
 package com.estsoft.finalproject.Post.service;
 
 import com.estsoft.finalproject.Post.domain.ScrapPost;
+import com.estsoft.finalproject.Post.dto.ScrapPostResponseDto;
 import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
 import com.estsoft.finalproject.mypage.repository.ScrappedArticleRepository;
 import com.estsoft.finalproject.user.domain.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,6 +31,16 @@ public class ScrapPostService {
         }
 
         scrapPostRepository.save(new ScrapPost(scrappedArticle));
+    }
+
+    public Page<ScrapPostResponseDto> getAllPosts(Pageable pageable) {
+        return scrapPostRepository.findAll(pageable)
+            .map(ScrapPost::toDto);
+    }
+
+    public Page<ScrapPostResponseDto> getAllPostsByTitle(String keyword, Pageable pageable) {
+        return scrapPostRepository.findByScrappedArticle_TitleContaining(keyword, pageable)
+            .map(ScrapPost::toDto);
     }
 
 }

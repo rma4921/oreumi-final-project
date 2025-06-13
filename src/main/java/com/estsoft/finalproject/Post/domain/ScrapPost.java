@@ -1,6 +1,8 @@
 package com.estsoft.finalproject.Post.domain;
 
+import com.estsoft.finalproject.Post.dto.ScrapPostResponseDto;
 import com.estsoft.finalproject.mypage.domain.ScrappedArticle;
+import com.estsoft.finalproject.user.domain.Users;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -41,5 +43,17 @@ public class ScrapPost {
     public ScrapPost(ScrappedArticle scrappedArticle) {
         this.scrappedArticle = scrappedArticle;
         this.postDate = LocalDateTime.now();
+    }
+
+    public ScrapPostResponseDto toDto() {
+        Users user = this.scrappedArticle.getUser();
+
+        return ScrapPostResponseDto.builder()
+            .postId(postId)
+            .nickname(user.getNickname())
+            .title(scrappedArticle.getTitle())
+            .topic(scrappedArticle.getTopic())
+            .postDate(postDate)
+            .build();
     }
 }
