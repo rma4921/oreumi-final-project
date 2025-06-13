@@ -8,6 +8,8 @@
     <link href="/css/fregment/search.css" rel="stylesheet">
 </head>
 <body>
+<div th:replace="layout/header/header :: headerFragment"></div>
+
 <form th:action="@{/mypage}" method="get" class="search-form">
     <input type="hidden" name="tab" th:value="${tab}"/>
     <input name="keyword" type="text" placeholder="제목으로 검색"
@@ -69,7 +71,7 @@
     <h3 class="section-title">작성한 댓글</h3>
     <div th:each="c : ${comments}">
         <div class="comment-item">
-            <div><strong>게시글:</strong> <a th:href="@{/mypage/scrap/{id}(id=${c.scrapId})}" th:text="${c.articleTitle}"></a></div>
+            <div><strong>게시글:</strong> <a th:href="@{/post/{id}(id=${c.postId})}" th:text="${c.articleTitle}"></a></div>
             <div><strong>작성한 댓글:</strong> <span th:text="${c.content}"></span></div>
             <div><strong>작성일:</strong> <span th:text="${#temporals.format(c.createTime, 'yyyy-MM-dd HH:mm')}"></span></div>
         </div>

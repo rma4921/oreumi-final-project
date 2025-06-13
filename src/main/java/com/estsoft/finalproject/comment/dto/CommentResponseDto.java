@@ -11,6 +11,7 @@ import lombok.Getter;
 public class CommentResponseDto {
     private Long commentId;
     private Long scrapId;
+    private Long postId;
     private String articleTitle;
     private String content;
     private LocalDateTime createTime;
