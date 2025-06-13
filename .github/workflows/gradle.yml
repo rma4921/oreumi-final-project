@@ -32,7 +32,7 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build --stacktrace --info --debug
+      run: ./gradlew build --stacktrace --info
 
     - name: Make zip file
       run: zip -r ./$GITHUB_SHA.zip .
