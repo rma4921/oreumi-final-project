@@ -53,11 +53,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <p class="mt-3">${content}</p>
                 <p><strong>관련 종목:</strong></p>
                 ${relatedCompaniesHTML}
-                <a class="btn btn-sm mt-3" href="${link}" target="_blank" style="background-color: #DCFDC7; border-color: #DCFDC7; color: #000;">
-                    원문 기사 보기
-                </a>
+                <div class="mt-3">
+                    <a class="btn btn-sm" href="${link}" target="_blank" style="background-color: #DCFDC7; border-color: #DCFDC7; color: #000;">
+                        원문 기사 보기
+                    </a>
+                </div>
                 <hr/>
-            `;
+        `;
             container.insertBefore(contentElement, document.getElementById("comment-list"));
 
             // 주가 보기 버튼
