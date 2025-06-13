@@ -11,7 +11,9 @@ import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 public class TokenTest {
     private JwtUtil jwtUtil;
 
