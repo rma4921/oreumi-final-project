@@ -44,8 +44,9 @@ public class TotalTest {
         user = new Users("google", "test@example.com", "tester", Role.ROLE_USER);
         usersRepository.save(user);
 
+        // accessToken과 refreshToken 구분해서 생성
         accessToken = jwtUtil.generateToken(user.getEmail(), user.getProvider());
-        refreshToken = jwtUtil.generateToken(user.getEmail(), user.getProvider());
+        refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getProvider());
 
         user.setRefreshToken(refreshToken);
         usersRepository.save(user);
@@ -54,7 +55,7 @@ public class TotalTest {
     @Test
     void 토큰_갱신_요청_시_정상_응답_확인() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/token/refresh")
-                .cookie(new Cookie("REFRESH", refreshToken)))
+                        .cookie(new Cookie("REFRESH", refreshToken)))
                 .andExpect(status().isOk())
                 .andExpect(cookie().exists("JWT"))
                 .andReturn();
@@ -67,7 +68,7 @@ public class TotalTest {
     @Test
     void Refresh_Token_유지_시_새로운_Access_Token_발급() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/token/refresh")
-                .cookie(new Cookie("REFRESH", refreshToken)))
+                        .cookie(new Cookie("REFRESH", refreshToken)))
                 .andExpect(status().isOk())
                 .andExpect(cookie().exists("JWT"))
                 .andReturn();
@@ -78,14 +79,14 @@ public class TotalTest {
 
     @Test
     void 로그아웃_후_인증이_필요한_API_접근_시_인증되지_않는지_확인() throws Exception {
-        // 로그아웃 요청
+        // 로그아웃 요청, 실제 로그아웃 URL과 쿠키명 일치하는지 확인
         mockMvc.perform(post("/logout")
                         .cookie(
                                 new Cookie("JWT", accessToken),
                                 new Cookie("REFRESH", refreshToken)
                         ))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login?logout"))
+                .andExpect(redirectedUrl("/login?logout")) // 리다이렉트 URL이 맞다면
                 .andExpect(cookie().maxAge("JWT", 0))
                 .andExpect(cookie().maxAge("REFRESH", 0));
 

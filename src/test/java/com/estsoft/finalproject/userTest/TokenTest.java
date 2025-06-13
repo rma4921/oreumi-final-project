@@ -1,37 +1,21 @@
 package com.estsoft.finalproject.userTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.estsoft.finalproject.user.jwt.JwtUtil;
 import io.jsonwebtoken.JwtException;
-import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+@SpringBootTest
 @ActiveProfiles("test")
 public class TokenTest {
+
+    @Autowired
     private JwtUtil jwtUtil;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        jwtUtil = new JwtUtil();
-
-        // 만료 시간 짧게 설정
-        Field accessTokenField = JwtUtil.class.getDeclaredField("accessTokenExpirationSeconds");
-        accessTokenField.setAccessible(true);
-        accessTokenField.set(jwtUtil, 1L);   // 1초 유효
-
-        Field refreshTokenField = JwtUtil.class.getDeclaredField("refreshTokenExpirationSeconds");
-        refreshTokenField.setAccessible(true);
-        refreshTokenField.set(jwtUtil, 60L); // 60초 유효
-
-        jwtUtil.init(); // 키 초기화
-    }
 
     @Test
     void JWT_claims_검증_및_만료_테스트() throws Exception {
@@ -46,7 +30,7 @@ public class TokenTest {
         String extractedProvider = jwtUtil.extractProvider(token);
         boolean expiredBefore = jwtUtil.isTokenExpired(token);
 
-        TimeUnit.MILLISECONDS.sleep(1500);  // 1.5초
+        TimeUnit.MILLISECONDS.sleep(1500);  // 1.5초 기다려서 토큰 만료 시킴
         boolean expiredAfter = jwtUtil.isTokenExpired(token);
 
         // then
