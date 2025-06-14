@@ -1,5 +1,6 @@
 package com.estsoft.finalproject.comment.entity;
 
+import com.estsoft.finalproject.user.domain.Users;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,7 +26,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable =false)
-    private User user;
+    private Users user;
 
     @Column(name = "post_id", nullable = false)
     private Long postId;
