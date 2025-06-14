@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class UsersViewController {
     private final UsersService usersService;
 
+    @GetMapping("/test")
+    public String test() {
+        return "배포 테스트 성공!";
+    }
+
     @GetMapping("/login")
     public String loginPage(Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
