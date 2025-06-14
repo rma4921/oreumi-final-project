@@ -17,9 +17,11 @@ public class UsersViewController {
     private final UsersService usersService;
 
     @GetMapping("/test")
-    public String test() {
-        return "배포 테스트 성공!";
+    public String test(Model model) {
+        model.addAttribute("message", "배포 테스트 성공!");
+        return "test";  // templates/test.html 렌더링
     }
+
 
     @GetMapping("/login")
     public String loginPage(Authentication authentication, Model model) {
