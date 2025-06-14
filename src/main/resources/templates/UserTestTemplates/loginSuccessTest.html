@@ -105,7 +105,7 @@
 
     // 토큰 갱신 테스트용 API 호출 함수
     document.getElementById('refreshTokenBtn').addEventListener('click', () => {
-        axios.post('http://localhost:8080/api/token/refresh', {}, { withCredentials: true })
+        axios.post('https://tobriefing.com/api/token/refresh', {}, { withCredentials: true })
             .then(() => {
                 console.log('토큰 갱신 성공!');
                 alert('토큰 갱신 성공! 콘솔 확인');

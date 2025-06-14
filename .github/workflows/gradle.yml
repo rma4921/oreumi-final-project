@@ -47,6 +47,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+
+    - name: Export PROPERTIES_SECRET to ENV
+      run: |
+        echo "PROPERTIES_SECRET<<EOF" >> $GITHUB_ENV
+        echo "${{ secrets.PROPERTIES_SECRET }}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
     - name: Upload to S3
       run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
 
