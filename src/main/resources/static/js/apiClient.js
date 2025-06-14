@@ -1,5 +1,7 @@
+const baseURL = window.location.hostname === 'localhost' ? 'http://localhost:8080' : '';
+
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080', // 환경에 맞게 변경 가능
+    baseURL,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
