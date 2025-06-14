@@ -1,11 +1,10 @@
 package com.estsoft.finalproject.comment.service;
 
-import com.estsoft.finalproject.comment.repository.UserRepository;
-import com.estsoft.finalproject.comment.entity.User;
-
 import com.estsoft.finalproject.comment.repository.CommentRepository;
 import com.estsoft.finalproject.comment.dto.CommentRequest;
 import com.estsoft.finalproject.comment.entity.Comment;
+import com.estsoft.finalproject.user.domain.Users;
+import com.estsoft.finalproject.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +17,11 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
 
-    public Comment save(CommentRequest request) {
+    public Comment save(CommentRequest request, Users user) {
         validateContent(request.getContent());
 
         LocalDateTime now = LocalDateTime.now();
-
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
         Comment comment = Comment.builder()
                 .postId(request.getPostId())
@@ -45,35 +40,32 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment updateComment(Long commentId, CommentRequest request) {
+    public Comment updateComment(Long commentId, CommentRequest request, Long userId) {
         validateContent(request.getContent());
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
 
+        if (!comment.getUser().getUserId().equals(userId)) {
+            throw new SecurityException("자신의 댓글만 수정할 수 있습니다.");
+        }
+
         comment.setContent(request.getContent());
+        comment.setUpdateTime(LocalDateTime.now());
 
         return comment;
     }
 
     @Transactional
-    public void deleteComment(Long id) {
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+    public void deleteComment(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글 없음"));
+
+        if (!comment.getUser().getUserId().equals(userId)) {
+            throw new SecurityException("자신의 댓글만 삭제할 수 있습니다.");
+        }
+
         commentRepository.delete(comment);
-
-        //public void deleteComment(Long commentId, Long userId) {
-        //    Comment comment = commentRepository.findById(commentId)
-        //        .orElseThrow(() -> new IllegalArgumentException("댓글 없음"));
-        //
-        //    if (!comment.getUserId().equals(userId)) {
-        //        throw new SecurityException("자신의 댓글만 삭제할 수 있습니다.");
-        //    }
-        //
-        //    commentRepository.delete(comment);
-        //}
-
-        //권한 체크 메서드 준비(삭제/수정)
     }
 
 
@@ -88,7 +80,7 @@ public class CommentService {
     }
 
     public List<Comment> findByUserId(Long userId) {
-        return commentRepository.findByUserId(userId);
+        return commentRepository.findByUser_UserId(userId);
     }
 
 
