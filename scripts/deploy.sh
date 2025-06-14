@@ -22,4 +22,4 @@ fi
 
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo "## deploy JAR file"   >> /home/ec2-user/action/spring-deploy.log
-nohup java -jar $DEPLOY_JAR >> /home/ec2-user/action/spring-deploy.log 2> /home/ec2-user/action/spring-deploy_err.log &
+nohup java -jar $DEPLOY_JAR --spring.config.location=file:/home/ec2-user/config/application.properties >> /home/ec2-user/action/spring-deploy.log 2> /home/ec2-user/action/spring-deploy_err.log &
