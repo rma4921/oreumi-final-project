@@ -1,7 +1,6 @@
 package com.estsoft.finalproject.comment.dto;
 
 import com.estsoft.finalproject.comment.entity.Comment;
-import com.estsoft.finalproject.comment.entity.User;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
