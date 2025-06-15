@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>다른 페이지</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #eef2f5;
+            text-align: center;
+            padding: 50px;
+        }
+        .box {
+            background-color: white;
+            display: inline-block;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .info {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>📄 다른 페이지입니다</h2>
+    <div class="info" id="user-info">사용자 정보를 불러오는 중...</div>
+    <div style="margin-top: 20px;">
+        <button onclick="goBack()">뒤로 가기</button>
+    </div>
+</div>
+
+<script src="/js/axios.min.js"></script>
+<script src="/js/apiClient.js"></script>
+<script>
+    // 뒤로가기 버튼
+    function goBack() {
+        window.location.href = "/loginSuccessTest";
+    }
+
+    // 페이지 로딩 시 사용자 정보 가져오기
+    window.apiClient.get('/api/users')
+        .then(response => {
+            const user = response.data;
+            document.getElementById('user-info').innerHTML = `
+                <p><strong>이메일:</strong> ${user.email}</p>
+                <p><strong>닉네임:</strong> ${user.nickname || '없음'}</p>
+                <p><strong>제공자:</strong> ${user.provider}</p>
+                <p><strong>가입일:</strong> ${user.registerDate}</p>
+                <p style="color:green;">✅ JWT 인증 성공</p>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('user-info').innerHTML = `<p style="color:red;">❌ 인증 실패: ${error.response?.data || error.message}</p>`;
+        });
+</script>
+
+</body>
+</html>
