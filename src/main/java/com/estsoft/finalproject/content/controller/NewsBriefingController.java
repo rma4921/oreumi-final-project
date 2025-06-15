@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,17 +19,22 @@ import com.estsoft.finalproject.content.model.dto.ResponseDto;
 import com.estsoft.finalproject.content.services.AlanCommunicationService;
 import com.estsoft.finalproject.content.services.RecommendationService;
 import com.estsoft.finalproject.content.services.WebSearchService;
+import com.estsoft.finalproject.mypage.dto.ScrappedArticleResponseDto;
+import com.estsoft.finalproject.mypage.service.ScrappedArticleService;
+import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 
 @RestController
 public class NewsBriefingController {
     private final WebSearchService webSearchService;
     private final AlanCommunicationService alanCommunicationService;
     private final RecommendationService recommendationService;
+    private final ScrappedArticleService scrappedArticleService;
 
-    public NewsBriefingController(WebSearchService webSearchService, AlanCommunicationService alanCommunicationService, RecommendationService recommendationService) {
+    public NewsBriefingController(WebSearchService webSearchService, AlanCommunicationService alanCommunicationService, RecommendationService recommendationService, ScrappedArticleService scrappedArticleService) {
         this.webSearchService = webSearchService;
         this.alanCommunicationService = alanCommunicationService;
         this.recommendationService = recommendationService;
+        this.scrappedArticleService = scrappedArticleService;
     }
 
     @GetMapping("/api/v1/briefing/latest")
@@ -63,6 +71,13 @@ public class NewsBriefingController {
     public ResponseEntity<ResponseDto<String>> getInvestmentRecommendation(@RequestParam(name = "company-name") String companyName) {
         ResponseDto<String> responseDto = recommendationService.getInvestmentTacticForCompany(companyName);
         return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto);
+    }
+
+    @PostMapping("/api/scrap")
+    public ResponseEntity<ScrappedArticleResponseDto> scrapAnArticle(@AuthenticationPrincipal CustomUsersDetails ud, 
+        @RequestBody String jsonScrapData) {
+        ResponseDto<ScrappedArticleResponseDto> responseDto = scrappedArticleService.scrapAnArticle(jsonScrapData, ud);
+        return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto.getItem());
     }
 
     //@GetMapping("/api/personal/strategy")
