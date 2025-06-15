@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const category = data.item.category || "분류 없음";
             const link = data.item.link || "#";
 
-
             let relatedCompaniesHTML = "없음";
             if (typeof data.item.relatedCompanies === "object" && data.item.relatedCompanies !== null) {
                 const entries = Object.entries(data.item.relatedCompanies);

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>상세 게시글</title>
 
+    <link href="/css/post/postDetail.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -14,8 +15,58 @@
 
 <div th:replace="layout/header/header :: headerFragment"></div>
 
+<div class="container">
+    <div class="title-row">
+        <h3 class="article-title" th:text="${scrappedArticle.title}">기사 제목</h3>
+    </div>
+
+    <div class="category-section">
+        <h4>카테고리</h4>
+        <div class="category-checkboxes">
+            <th:block th:each="category : ${categories}">
+                <label>
+                    <input type="checkbox" name="categoryNames"
+                           th:value="${category.categoryName}"
+                           th:checked="${#lists.contains(checkedCategories, category.categoryName)}"
+                           disabled>
+                    <span th:text="${category.categoryName}"></span>
+                </label>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="info">
+        <strong>스크랩한 날짜:</strong>
+        <span th:text="${#temporals.format(scrappedArticle.scrapDate, 'yyyy-MM-dd HH:mm')}"></span>
+        <a th:href="@{/mypage}" class="back-button">뒤로가기</a>
+    </div>
+
+    <div class="info">
+        <strong>URL:</strong>
+        <a th:href="${scrappedArticle.link}" target="_blank" th:text="${scrappedArticle.link}"></a>
+    </div>
+
+    <div class="info">
+        <strong>기사 발행일:</strong>
+        <span th:text="${#temporals.format(scrappedArticle.pubDate, 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
+
+    <div class="description" th:text="${scrappedArticle.description}"></div>
+
+    <div class="info">
+        <strong>핵심 요약:</strong>
+        <span th:text="${scrappedArticle.topic}"></span>
+    </div>
+
+    <div class="related-stock-title">관련주식</div>
+    <div class="stock-buttons">
+        <th:block th:each="stock : ${relatedStocks}">
+            <button class="stock-button" th:text="${stock.name}"></button>
+        </th:block>
+    </div>
+</div>
+
 <div class="container mt-4">
-    <h1 id="headline">로딩중...</h1>
 
     <h2 class="mt-4"></h2>
     <ul class="list-unstyled comment-list" id="comment-list"></ul>
