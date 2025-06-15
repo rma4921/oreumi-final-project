@@ -23,6 +23,7 @@ import org.springframework.web.client.RestClient.ResponseSpec;
 
 import com.estsoft.finalproject.content.model.dto.AlanResponseDto;
 import com.estsoft.finalproject.content.model.dto.NewsDetailItem;
+import com.estsoft.finalproject.content.model.dto.NewsSummaryItem;
 import com.estsoft.finalproject.content.model.dto.ResponseDto;
 import com.estsoft.finalproject.content.prompting.SimpleAlanKoreanPromptBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,14 +85,73 @@ public class AlanCommunicationService {
         return getResultFromAlan(translateQuery);
     }
 
-    public AlanResponseDto findRelatedStock(String topic, int numberOfRelatedCompanies) {
-        String translateQuery = new StringBuilder("다음 주제와 관련된 주식에 대한 정보 찾아줘. (최대 ").append(numberOfRelatedCompanies).append("개) : \"")
-            .append(topic)
+    public ResponseDto<Map<String, String>> findRelatedStock(String articleSummaryOrUrl, boolean isURL) {
+        LinkedHashMap<String, String> ret = new LinkedHashMap<>();
+        StringBuilder promptBuilder = new StringBuilder();
+        if (isURL) {
+            promptBuilder.append("다음 URL에 있는 기사와 관련된 주식 종목들을 찾아줘 : \"");
+        } else {
+            promptBuilder.append("다음 글과 관련된 주식 종목들을 찾아줘 : \"");
+        }
+        promptBuilder.append(articleSummaryOrUrl)
             .append("\"")
-            .append(" 상장되지 않았거나, 정보를 찾을 수 없는 회사는 생략해도 돼. ")
             .append(" 답변은 다음 형식으로 해줘: \"")
-            .append("[{ \"company\" : (회사명), \"stock_price\" : (현재 주가) }]").toString();
-        return getResultFromAlan(translateQuery);
+            .append("[{ \"company\" : (회사명)}]");
+        AlanResponseDto companyInfos = getResultFromAlan(promptBuilder.toString());
+        
+        if (companyInfos.getResponseCode() != HttpStatus.OK) {
+            return ResponseDto.builder(Collections.unmodifiableMap(ret)).
+                message("Failed to find related stock due to failed HTTP request").
+                responseCode(companyInfos.getResponseCode()).build();
+        }
+
+        String unsanitizedCompanyListString = companyInfos.getContent();
+        if (!unsanitizedCompanyListString.startsWith("[") || !unsanitizedCompanyListString.endsWith("]")) {
+            int startJson = unsanitizedCompanyListString.indexOf('[');
+            int endJson = unsanitizedCompanyListString.lastIndexOf(']');
+            unsanitizedCompanyListString = unsanitizedCompanyListString.substring(startJson, endJson + 1);
+        }
+        
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            List<String> unsanitizedCompanyList = new ArrayList<>();
+            StringBuilder companyListBuilder = new StringBuilder();
+            Optional<JsonNode> companies = Optional.of(mapper.readTree(unsanitizedCompanyListString));
+            if (companies.isEmpty()) {
+                logger.error("Failed to read related company data information: JSON mapper returned NULL!");
+                return ResponseDto.builder(Collections.unmodifiableMap(ret)).
+                    message("Failed to read related company data information: JSON mapper returned NULL!").
+                    responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            companies.get().forEach(x -> unsanitizedCompanyList.add(x.get("company").asText()));
+            sanitizeCompanyList(unsanitizedCompanyList).forEach(x -> companyListBuilder.append("[" + x + "] "));
+            AlanResponseDto companyInvestmentAdvice = getResultFromAlan(SimpleAlanKoreanPromptBuilder.start().
+                addCommand("다음 주식 종목들에 대한 투자 조언을 해 줘.").
+                addContext("주식 종목들은 " + companyListBuilder.toString().trim()).
+                setOutputFormat("[{\"company_name\" : (주식 종목명), \"advice\" : (투자 조언)}]").
+                buildPrompt());
+            String ia = companyInvestmentAdvice.getContent();
+            if (!ia.startsWith("[") || !ia.endsWith("]")) {
+                int startJson = ia.indexOf('[');
+                int endJson = ia.lastIndexOf(']');
+                ia = ia.substring(startJson, endJson + 1);
+            }
+            Optional.ofNullable(mapper.readTree(ia)).ifPresent(x -> x.forEach(y -> {
+                String cName = Optional.ofNullable(y.get("company_name")).map(JsonNode::asText).orElse("null");
+                String cAdvise = Optional.ofNullable(y.get("advice")).map(JsonNode::asText).orElse("null");
+                if (!cName.equalsIgnoreCase("null") && !cAdvise.equalsIgnoreCase("null")) {
+                    ret.put(cName, cAdvise);
+                }
+            }));
+        } catch (JsonProcessingException jex) {
+            logger.error("Failed to parse company data due to malformed JSON response!");
+            return ResponseDto.builder(Collections.unmodifiableMap(ret)).
+                message("Failed to parse company data due to malformed JSON response!").
+                responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return ResponseDto.builder(Collections.unmodifiableMap(ret)).
+            message("Successfully fetched related stocks.").
+            responseCode(HttpStatus.OK).build();
     }
 
     public AlanResponseDto summarizeArticle(String articleUrl) {
@@ -103,6 +163,51 @@ public class AlanCommunicationService {
             .append(" 답변은 다음 형식으로 해줘: \"")
             .append("{ \"headline\" : (제목), \"content\" : (자세한 요약), \"category\" : (카테고리), \"topic\" : (대략적인 주제), \"companies\"  : [{\"company_name\"  : (종목명)}] }").toString();
         return getResultFromAlan(translateQuery);
+    }
+
+    public ResponseDto<NewsSummaryItem> onlySummarizeArticle(String articleUrl) {
+           String category = "";
+           if (articleUrl.contains("sid=") && !articleUrl.endsWith("&sid=")) {
+                switch(articleUrl.split("sid=")[1]) {
+                    case "100":
+                        category = "정치";
+                        break;
+                    case "101":
+                        category = "경제";
+                        break;
+                    case "102":
+                        category = "사회";
+                        break;
+                    case "103":
+                        category = "생활문화";
+                        break;
+                    case "104":
+                        category = "세계";
+                        break;
+                    case "105":
+                        category = "IT과학";
+                        break;
+                    case "106": // 연예
+                        category = "생활문화";
+                        break;
+                    case "107": // 스포츠
+                        category = "생활문화";
+                        break;
+                    default:
+                        category = "";
+                        break;
+                }
+        }
+        String translateQuery = new StringBuilder("이 URL에 있는 기사 자세히 요약해줘: ")
+            .append(articleUrl).toString();
+        AlanResponseDto res = getResultFromAlan(translateQuery);
+        
+        NewsSummaryItem item = NewsSummaryItem.builder().
+            content(res.getContent()).
+            category(category).
+            timestamp(getTimeInfoForArticle(articleUrl).getItem()).
+            headline(getHeadlineForArticle(articleUrl).getItem()).link(articleUrl).build();
+        return ResponseDto.builder(item).message(res.getResponseCode().toString()).responseCode(res.getResponseCode()).build();
     }
 
     public AlanResponseDto getInvestmentTactic(List<String> listOfArticles, List<String> listOfInterestedStocks) {
@@ -161,6 +266,40 @@ public class AlanCommunicationService {
         }
     }
 
+    public ResponseDto<String> getHeadlineForArticle(String url) {
+        try {
+            ResponseSpec res = restClient.get().uri(URI.create(url))
+                .retrieve();
+            String r = res.body(String.class);
+            if (!r.contains("id=\"title_area\"")) {
+                return ResponseDto.builder("").message("News article data does not contain valid headline data").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            String[] headline1 = r.split("id=\"title_area\"");
+            if (headline1.length < 2) {
+                return ResponseDto.builder("").message("News article data does not contain valid headline data (invalid headline node)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            if (!headline1[1].contains("/h2>")) {
+                return ResponseDto.builder("").message("News article data does not contain valid headline data (invalid h2 tag)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            String headline2 = headline1[1].split("/h2>")[0];
+            if (!headline2.contains("<")) {
+                return ResponseDto.builder("").message("News article data does not contain valid headline data (invalid h2 tag)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            String[] headline3 = headline2.split(">");
+            StringBuilder headlineBuilder = new StringBuilder();
+            for (String sc: headline3) {
+                if (sc.contains("<")) {
+                    String[] scs = sc.split("<");
+                    if (scs.length != 0) {
+                        headlineBuilder.append(scs[0].trim());
+                    }
+                }
+            }
+            return ResponseDto.builder(headlineBuilder.toString()).message("Success").responseCode(HttpStatus.OK).build();
+        } catch (HttpStatusCodeException hex) {
+            return ResponseDto.builder("").message("A HTTP fetch exception occurred while retrieving the headline data").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     public ResponseDto<LocalDateTime> getTimeInfoForArticle(String url) {
         LocalDateTime errorItem = LocalDateTime.now();

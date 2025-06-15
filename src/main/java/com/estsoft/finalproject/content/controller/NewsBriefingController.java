@@ -1,6 +1,7 @@
 package com.estsoft.finalproject.content.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.estsoft.finalproject.content.model.dto.NewsBriefingItem;
 import com.estsoft.finalproject.content.model.dto.NewsDetailItem;
 import com.estsoft.finalproject.content.model.dto.NewsSearchItem;
+import com.estsoft.finalproject.content.model.dto.NewsSummaryItem;
 import com.estsoft.finalproject.content.model.dto.ResponseDto;
 import com.estsoft.finalproject.content.services.AlanCommunicationService;
 import com.estsoft.finalproject.content.services.RecommendationService;
@@ -36,6 +38,18 @@ public class NewsBriefingController {
     @GetMapping("/api/v1/briefing/ai_detail")
     public ResponseEntity<ResponseDto<NewsDetailItem>> getDetailedInfo(@RequestParam(name = "news-url") String newsUrl) {
         ResponseDto<NewsDetailItem> responseDto = alanCommunicationService.getNewsDetails(newsUrl);
+        return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto);
+    }
+
+    @GetMapping("/api/v1/briefing/ai_summary")
+    public ResponseEntity<ResponseDto<NewsSummaryItem>> getSummaryOnly(@RequestParam(name = "news-url") String newsUrl) {
+        ResponseDto<NewsSummaryItem> responseDto = alanCommunicationService.onlySummarizeArticle(newsUrl);
+        return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto);
+    }
+
+    @GetMapping("/api/v1/briefing/related-companies")
+    public ResponseEntity<ResponseDto<Map<String, String>>> getRelatedCompanies(@RequestParam(name = "news-url") String newsUrl) {
+        ResponseDto<Map<String, String>> responseDto = alanCommunicationService.findRelatedStock(newsUrl, true);
         return ResponseEntity.status(responseDto.getResponseCode()).body(responseDto);
     }
 

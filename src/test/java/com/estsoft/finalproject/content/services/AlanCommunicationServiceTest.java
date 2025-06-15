@@ -1,6 +1,7 @@
 package com.estsoft.finalproject.content.services;
 
 import java.util.List;
+import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.estsoft.finalproject.content.model.dto.AlanResponseDto;
+import com.estsoft.finalproject.content.model.dto.ResponseDto;
 import com.estsoft.finalproject.content.prompting.SimpleAlanKoreanPromptBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,13 +62,9 @@ public class AlanCommunicationServiceTest {
     @Test
     void testFindRelatedStock() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testFindRelatedStock()");
-        AlanResponseDto res = alanCommunicationService.findRelatedStock("한화에어로스페이스", 3);
+        ResponseDto<Map<String, String>> res = alanCommunicationService.findRelatedStock("https://n.news.naver.com/mnews/article/018/0006034594?sid=101", true);
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
-        Assertions.assertThat(res.getContent()).isNotEmpty();
-        logger.info("Question is: " + res.getQuestion());
-        logger.info("Result is: " + res.getContent());
-        logger.info("Status is: " + res.getResponseCode());
-        logger.info("Time is: " + res.getTimestamp());
+        res.getItem().forEach((x, y) -> logger.info("Company Name: " + x + " Investment Tip: " + y));
     }
 
     @Test
