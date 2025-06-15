@@ -20,7 +20,7 @@
     <h3 class="post-title">공유한 스크랩 기사</h3>
     <div th:each="item : ${posts}">
         <div class="post-item">
-            <h5><a th:href="@{/post/{id}(id=${item.postId})}"
+            <h5><a th:href="@{/posts/{id}(id=${item.postId})}"
                    th:text="${item.title}"></a>
             </h5>
             <div class="post-date">

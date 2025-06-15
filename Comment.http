@@ -1,0 +1,33 @@
+### 댓글 생성
+POST http://localhost:8080/api/comments
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "userId": 1,
+  "content": "좋은 글 안감사합니다!"
+}
+
+### 댓글 생성
+POST http://localhost:8080/api/comments
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "userId": 2,
+  "content": "좋은 글 감사합니다!"
+}
+
+### 댓글 삭제
+DELETE http://localhost:8080/api/comments/3
+
+
+### 댓글 수정
+PUT http://localhost:8080/api/comments/1
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "userId": 2,
+  "content": "댓글을 수정합니다!"
+}
