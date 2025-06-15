@@ -1,6 +1,5 @@
 package com.estsoft.finalproject.comment.entity;
 
-import com.estsoft.finalproject.Post.domain.ScrapPost;
 import com.estsoft.finalproject.user.domain.Users;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,7 +42,4 @@ public class Comment {
     @Column(name = "updated_date")
     private LocalDateTime updateTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private ScrapPost scrapPost;
 }

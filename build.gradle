@@ -30,7 +30,6 @@ dependencies {
 
     // === DB Drivers ===
     runtimeOnly 'com.mysql:mysql-connector-j'         // 운영/로컬용
-    runtimeOnly 'com.h2database:h2'                    // 테스트용
     testImplementation 'com.h2database:h2'             // 테스트에서도 H2 사용
 
     // === JWT & 암호화 ===

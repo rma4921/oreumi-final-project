@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-        const response = await fetch(`/api/briefing/ai_detail?news-url=${encodeURIComponent(newsUrl)}`);
+        const response = await fetch(`/api/v1/briefing/ai_detail?news-url=${encodeURIComponent(newsUrl)}`);
         const data = await response.json();
 
         console.log("AI 요약 응답:", data);
