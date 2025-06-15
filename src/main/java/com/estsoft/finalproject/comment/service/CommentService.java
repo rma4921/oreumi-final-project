@@ -1,5 +1,6 @@
 package com.estsoft.finalproject.comment.service;
 
+import com.estsoft.finalproject.Post.domain.ScrapPost;
 import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.comment.repository.CommentRepository;
 import com.estsoft.finalproject.user.domain.Users;
@@ -63,9 +64,8 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-
-    public List<Comment> findByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
+    public List<Comment> findByPostId(ScrapPost scrapPost) {
+        return commentRepository.findByScrapPost(scrapPost);
     }
 
     @Transactional
