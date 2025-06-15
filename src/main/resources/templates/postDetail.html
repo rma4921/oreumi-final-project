@@ -21,8 +21,8 @@
     <ul class="list-unstyled comment-list" id="comment-list"></ul>
 
     <form id="comment-form">
-        <input type="hidden" id="postId" value="1">
-        <input type="hidden" id="userId" value="1">
+        <input type="hidden" id="postId" th:value="${postId}" />
+        <input type="hidden" id="userId" th:value="${userId}" />
 
         <div class="mb-2">
             <textarea id="content" placeholder="댓글을 입력하세요"
@@ -36,6 +36,5 @@
 </div>
 
 <script src="/js/comment.js"></script>
-<script type="module" src="/js/news-detail.js"></script>
 </body>
 </html>

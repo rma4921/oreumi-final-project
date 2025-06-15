@@ -12,7 +12,7 @@ async function getContents() {
                 let timestamp = document.createElement("div");
                 itemToAdd.classList.add("news-item")
                 headline.innerHTML = x.headline;
-                headline.setAttribute("href", x.refLink);
+                headline.setAttribute("href", `/news/detail?news-url=${encodeURIComponent(x.refLink)}`);
                 summary.classList.add("news-topic");
                 summary.innerHTML = x.summary;
                 timestamp.classList.add("news-date");

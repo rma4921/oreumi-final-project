@@ -7,8 +7,8 @@ async function handleSubmit(e) {
     isSubmitting = true;
 
     const contentInput = document.getElementById("content");
-    const postId = document.getElementById("postId").value;
-    const userId = document.getElementById("userId").value;
+    const postId = Number(document.getElementById("postId").value);
+    const userId = Number(document.getElementById("userId").value);
     const content = contentInput.value.trim();
 
     try {
@@ -23,7 +23,11 @@ async function handleSubmit(e) {
             await loadComments(postId);
         } else {
             const errorText = await response.text();
-            alert(errorText || "댓글 등록 실패");
+            if (response.status === 401) {
+                alert(errorText || "비회원은 댓글을 달 수 없습니다.");
+            } else {
+                alert(errorText || "댓글 등록 실패.")
+            }
         }
     } catch (err) {
         console.error(err);
@@ -37,7 +41,14 @@ async function loadComments(postId) {
     const list = document.getElementById("comment-list");
     try {
         const res = await fetch(`/api/comments/post/${postId}`, { cache: "no-store" });
-        const data = await res.json();
+        let data;
+        try {
+            data = await res.json();
+        } catch (err) {
+            const text = await res.text();
+            console.error("응답이 JSON 형식이 아님:", text);
+            throw new Error("댓글 응답 오류");
+        }
         list.innerHTML = "";
 
         data.forEach(comment => {

@@ -20,13 +20,16 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
-    private final CommentRepository commentRepository;
 
     // 로그인된 사용자 기반 댓글 작성
     @PostMapping
-    public ResponseEntity<CommentResponse> save(@RequestBody CommentRequest request,
-                                                @AuthenticationPrincipal CustomUsersDetails userDetails) {
-        Users user = userDetails.getUsers();
+    public ResponseEntity<?> save(@RequestBody CommentRequest request,
+                                       @AuthenticationPrincipal CustomUsersDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("비회원은 댓글을 달 수 없습니다.");
+        }
+       
+       Users user = userDetails.getUsers();
         Comment comment = commentService.save(request, user);
         return ResponseEntity.ok(new CommentResponse(comment));
     }
