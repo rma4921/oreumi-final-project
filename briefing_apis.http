@@ -1,0 +1,61 @@
+### GET 최신 뉴스기사를 조회합니다
+# 응답 결과:
+#{
+#  "item": [
+#    {
+#      "headline": "기사 제목",
+#      "summary": "기사 내용 일부 (검색결과)",
+#      "link": "기사 원본 링크",
+#      "refLink": "네이버 뉴스 기사 링크",
+#      "timestamp": "기사 작성 시간"
+#    }
+#  ],
+#  "responseCode": "HTTP 응답 결과 (예: OK)",
+#  "message": "응답 메시지 (성공일 경우 Search complete!)",
+#  "size": 뉴스 갯수
+#}
+GET http://localhost:8080/api/v1/briefing/latest
+
+### GET 네이버 뉴스 기사에 대한 AI 요약과 관련 주식 종목들을 조회합니다.
+# 응답 결과:
+#{
+#  "item": {
+#    "headline": "기사 제목",
+#    "content": "AI가 요약한 기사 내용",
+#    "link": "기사 링크 (네이버 뉴스)",
+#    "topic": "기사의 간략한 주제",
+#    "category": "AI가 파악한 기사의 분류",
+#    "timestamp": "기사 작성 시간",
+#    "relatedCompanies": {
+#      "해당 기사와 관련된 회사 (공식 상장명칭)": "간략한 투자 조언"
+#    }
+#  },
+#  "responseCode": "HTTP 응답 결과 (예: OK)",
+#  "message": "응답 메시지",
+#  "size": 1
+#}
+GET http://localhost:8080/api/v1/briefing/ai_detail?news-url=https://n.news.naver.com/mnews/article/018/0006034594?sid=101
+
+### GET 네이버 뉴스 기사에 대한 정보를 가져옵니다. AI와 상호작용을 하지 않아, 대기 없이 결과를 바로 가져옵니다.
+# 응답 결과:
+#{
+#  "item": {
+#    "category": "기사 분류 (네이버 뉴스 기준)",
+#    "headline": "기사 제목",
+#    "content": "기사 내용",
+#    "timestamp": "기사 작성 시간"
+#  },
+#  "responseCode": "HTTP 응답 결과 (예: OK)",
+#  "message": "응답 메시지",
+#  "size": 1
+#}
+GET http://localhost:8080/api/v1/briefing/detail?news-url=https://n.news.naver.com/mnews/article/018/0006034594?sid=101
+
+### GET 특정 회사에 대한 AI의 추천 정보를 제공합니다. company-name에 대입되는 회사명은 반드시 증시에 상장된 공식 명칭이어야 합니다. 위의 /api/v1/briefing/ai_detail API의 relatedCompanies의 회사명을 인수로 제공하면 됩니다.
+#{
+#  "item": "해당 회사에 대한 AI의 투자 조언.",
+#  "responseCode": "HTTP 응답 결과 (예: OK)",
+#  "message": "응답 메시지",
+#  "size": 1
+#}
+GET http://localhost:8080/api/v1/briefing/recommendation?company-name=한화에어로스페이스

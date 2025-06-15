@@ -3,6 +3,8 @@ package com.estsoft.finalproject.user.controller;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import com.estsoft.finalproject.user.dto.UsersResponse;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,5 +37,17 @@ public class UsersController {
         log.info("인증된 사용자 정보 조회 성공: 이메일 = {}, 프로바이더 = {}", userDetails.getUsername(), userDetails.getUsers().getProvider());
 
         return ResponseEntity.ok(new UsersResponse(users));
+    }
+
+    @GetMapping("/api/user/status")
+    public ResponseEntity<Map<String, Object>> getLoginStatus(Authentication authentication) {
+        Map<String, Object> result = new HashMap<>();
+        if (authentication != null && authentication.isAuthenticated()) {
+            result.put("loggedIn", true);
+            result.put("username", authentication.getName());
+        } else {
+            result.put("loggedIn", false);
+        }
+        return ResponseEntity.ok(result);
     }
 }

@@ -1,0 +1,37 @@
+### GET 특정 회사에 대한 지난 N일간의 주가 정보를 가져옵니다. 해당 회사의 ISIN 코드를 통해 조회합니다.
+# URL 매개변수: isin=(ISIN 코드), count=(가져올 일수)
+# 응답 결과:
+#{
+#  "item": [
+#    {
+#      "isin": "ISIN 코드",
+#      "name": "회사의 공식 상장명칭",
+#      "price": 주가 (폐장 기준),
+#      "baseDate": "기준일",
+#      "fluctuationRate": 전일 대비 변동율
+#    }
+#  ],
+#  "responseCode": "응답 코드",
+#  "message": "응답 메시지(n items)",
+#  "size": 요청한 갯수
+#}
+GET http://localhost:8080/api/v1/stock-price/by-isin?isin=KR7012450003&count=30
+
+### GET 특정 회사에 대한 지난 N일간의 주가 정보를 가져옵니다. 해당 회사의 공식 상장명칭을 통해 조회합니다.
+# URL 매개변수: name=(해당 회사의 공식 상장명칭), count=(가져올 일수)
+# 응답 결과:
+#{
+#  "item": [
+#    {
+#      "isin": "ISIN 코드",
+#      "name": "회사의 공식 상장명칭",
+#      "price": 주가 (폐장 기준),
+#      "baseDate": "기준일",
+#      "fluctuationRate": 전일 대비 변동율
+#    }
+#  ],
+#  "responseCode": "응답 코드",
+#  "message": "응답 메시지(n items)",
+#  "size": 요청한 갯수
+#}
+GET http://localhost:8080/api/v1/stock-price/by-name?name=한화에어로스페이스&count=30

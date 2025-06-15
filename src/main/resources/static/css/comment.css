@@ -1,0 +1,14 @@
+.custom-submit-btn {
+    background-color: #DCFDC7;
+    color: #000;
+    border: none;
+}
+/* 댓글 입력창 최소 높이 지정 */
+.comment-input {
+    resize: none;
+    min-height: 80px;
+}
+/* 댓글 리스트 항목 간 간격 */
+.comment-list li {
+    margin-bottom: 1rem;
+}

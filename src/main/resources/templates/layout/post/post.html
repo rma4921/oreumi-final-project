@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>소통 게시판</title>
+    <link href="/css/post/post.css" rel="stylesheet">
+    <link href="/css/fregment/body.css" rel="stylesheet">
+    <link href="/css/fregment/search.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="layout/header/header :: headerFragment"></div>
+
+<form th:action="@{/post}" method="get" class="search-form">
+    <input name="keyword" type="text" placeholder="제목으로 검색"
+           th:value="${keyword} ?: ''" class="search-input"/>
+    <button type="submit" class="search-button">검색</button>
+</form>
+
+<div class="post-section">
+    <h3 class="post-title">공유한 스크랩 기사</h3>
+    <div th:each="item : ${posts}">
+        <div class="post-item">
+            <h5><a th:href="@{/posts/{id}(id=${item.postId})}"
+                   th:text="${item.title}"></a>
+            </h5>
+            <div class="post-date">
+                작성 날짜: <span
+                th:text="${#temporals.format(item.postDate, 'yyyy-MM-dd HH:mm')}"></span>
+            </div>
+            <div class="post-user">
+                작성자: <span
+                th:text="${item.nickname}"></span>
+            </div>
+            <div class="post-topic">
+                핵심 요약: <span th:text="${item.topic}"></span>
+            </div>
+        </div>
+    </div>
+
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:if="${hasPrevBlock}">
+                <a class="page-link" th:href="@{/post(page=${startPage - 1})}">«</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/post(page=${i})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:if="${hasNextBlock}">
+                <a class="page-link" th:href="@{/post(page=${endPage + 1})}">»</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<script src="/js/axios.min.js"></script>
+<script src="/js/apiClient.js"></script>
+</body>
+</html>

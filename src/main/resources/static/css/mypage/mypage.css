@@ -1,0 +1,104 @@
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    border-bottom: 1px solid #ddd;
+    gap: 30px;
+    padding-bottom: 10px;
+}
+
+.tabs a {
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
+    text-decoration: none;
+    padding: 8px 0;
+    position: relative;
+}
+
+.tabs a:hover {
+    color: #00c73c;
+}
+
+.tabs a.active-tab {
+    color: #00c73c;
+    font-weight: 600;
+}
+
+.tabs a.active-tab::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #00c73c;
+    position: absolute;
+    bottom: -11px;
+    left: 0;
+}
+
+.scrap-section, .comment-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    border-left: 4px solid #00c73c;
+    padding-left: 10px;
+}
+
+.post-item, .comment-item{
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.post-item h5 {
+    font-size: 16px;
+    margin: 0 0 4px;
+    font-weight: 500;
+    color: #111;
+    cursor: pointer;
+}
+
+.post-item h5:hover {
+    text-decoration: underline;
+}
+
+.post-category,
+.post-topic,
+.post-date {
+    font-size: 13px;
+    color: #555;
+    margin-top: 2px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 20px 0;
+    gap: 4px;
+}
+
+.page-item a.page-link {
+    display: block;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+.page-item.active a.page-link {
+    background-color: #00c73c;
+    color: white;
+    border-color: #00c73c;
+}
+
+.page-item a.page-link:hover {
+    background-color: #f5f5f5;
+}
