@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>마이 페이지</title>
+    <link href="/css/mypage/mypage.css" rel="stylesheet">
+    <link href="/css/fregment/body.css" rel="stylesheet">
+    <link href="/css/fregment/search.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="layout/header/header :: headerFragment"></div>
+
+<form th:action="@{/mypage}" method="get" class="search-form">
+    <input type="hidden" name="tab" th:value="${tab}"/>
+    <input name="keyword" type="text" placeholder="제목으로 검색"
+           th:value="${keyword} ?: ''" class="search-input"/>
+    <button type="submit" class="search-button">검색</button>
+</form>
+
+<div class="tabs">
+    <a th:href="@{/mypage(tab='scrap')}"
+       th:classappend="${tab == 'scrap'} ? ' active-tab' : ''">
+        스크랩한 기사
+    </a>
+    <a th:href="@{/mypage(tab='comment')}"
+       th:classappend="${tab == 'comment'} ? ' active-tab' : ''">
+        작성한 댓글
+    </a>
+</div>
+
+<div th:if="${tab == 'scrap'}" class="scrap-section">
+    <h3 class="section-title">스크랩한 게시글</h3>
+    <div th:each="item : ${scrappedArticle}">
+        <div class="post-item">
+            <h5><a th:href="@{/mypage/scrap/{id}(id=${item.scrapId})}"
+                   th:text="${item.title}"></a>
+            </h5>
+            <div class="post-category">
+                카테고리: <span
+                th:each="categoryName : ${articlesCategory[item.scrapId]}"
+                th:text="${categoryName} + ' '"></span>
+            </div>
+            <div class="post-topic">
+                핵심 요약: <span th:text="${item.topic}"></span>
+            </div>
+            <div class="post-date">
+                스크랩 날짜: <span
+                th:text="${#temporals.format(item.scrapDate, 'yyyy-MM-dd HH:mm')}"></span>
+            </div>
+        </div>
+    </div>
+
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:if="${hasPrevBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${startPage - 1})}">«</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${i})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:if="${hasNextBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${endPage + 1})}">»</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div th:if="${tab == 'comment'}" class="comment-section">
+    <h3 class="section-title">작성한 댓글</h3>
+    <div th:each="c : ${comments}">
+        <div class="comment-item">
+            <div><strong>게시글:</strong> <a th:href="@{/post/{id}(id=${c.postId})}"
+                                          th:text="${c.articleTitle}"></a></div>
+            <div><strong>작성한 댓글:</strong> <span th:text="${c.content}"></span></div>
+            <div><strong>작성일:</strong> <span
+                th:text="${#temporals.format(c.createTime, 'yyyy-MM-dd HH:mm')}"></span></div>
+        </div>
+    </div>
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:if="${hasPrevBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${startPage - 1})}">«</a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/mypage(commentPage=${i}, tab='comment')}"
+                   th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:if="${hasNextBlock}">
+                <a class="page-link" th:href="@{/mypage(scrapPage=${endPage + 1})}">»</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<script src="/js/axios.min.js"></script>
+<script src="/js/apiClient.js"></script>
+</body>
+</html>

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UsersService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+
     private final UsersRepository usersRepository;
 
     @Override
@@ -51,13 +52,14 @@ public class CustomOAuth2UsersService implements OAuth2UserService<OAuth2UserReq
                 nickname = (String) extractedAttributes.get("nickname");
             }
             case "kakao" -> {
-                Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+                Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get(
+                    "kakao_account");
                 Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
                 email = (String) kakaoAccount.get("email");
                 nickname = (String) profile.get("nickname");
 
                 extractedAttributes = new HashMap<>(attributes);
-                extractedAttributes.put("email", email);  // 보장
+                extractedAttributes.put("email", email);
             }
             default -> throw new OAuth2AuthenticationException("Unknown provider: " + provider);
         }
@@ -68,14 +70,13 @@ public class CustomOAuth2UsersService implements OAuth2UserService<OAuth2UserReq
             return usersRepository.save(newUsers);
         });
 
-        // UnmodifiableMap 문제를 피하기 위해 복사
         Map<String, Object> modifiableAttributes = new HashMap<>(extractedAttributes);
         modifiableAttributes.put("provider", provider);
 
         return new DefaultOAuth2User(
-                List.of(new SimpleGrantedAuthority(users.getRole().name())),
-                modifiableAttributes,
-                "email"
+            List.of(new SimpleGrantedAuthority(users.getRole().name())),
+            modifiableAttributes,
+            "email"
         );
     }
 }

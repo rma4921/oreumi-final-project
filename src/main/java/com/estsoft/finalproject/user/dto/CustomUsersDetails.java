@@ -29,7 +29,7 @@ public class CustomUsersDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null; // 소셜 로그인이라면 비밀번호는 null 처리
+        return null;
     }
 
     @Override

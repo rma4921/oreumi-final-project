@@ -28,47 +28,45 @@ public class JwtUtil {
         log.info("JWT 키 초기화 완료");
     }
 
-    // JWT 생성
     public String generateToken(String email, String provider) {
         log.info("JWT 토큰 생성 중");
 
         String token = Jwts.builder()
-                .setSubject(email)
-                .claim("provider", provider)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationSeconds * 1000))
-                .signWith(secretKey)
-                .compact();
+            .setSubject(email)
+            .claim("provider", provider)
+            .setIssuedAt(new Date())
+            .setExpiration(
+                new Date(System.currentTimeMillis() + accessTokenExpirationSeconds * 1000))
+            .signWith(secretKey)
+            .compact();
 
         log.info("JWT 토큰 생성 완료: {}", token);
         return token;
     }
 
-    // Refresh Token 생성
     public String generateRefreshToken(String email, String provider) {
         return Jwts.builder()
-                .setSubject(email)
-                .claim("provider", provider)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationSeconds * 1000))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
+            .setSubject(email)
+            .claim("provider", provider)
+            .setIssuedAt(new Date())
+            .setExpiration(
+                new Date(System.currentTimeMillis() + refreshTokenExpirationSeconds * 1000))
+            .signWith(secretKey, SignatureAlgorithm.HS256)
+            .compact();
     }
 
-    // JWT 검증 및 이메일 추출
     public String extractEmail(String token) {
         try {
-            // "Bearer " 접두사 제거 (있을 경우만)
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
             }
 
             return Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
         } catch (ExpiredJwtException e) {
             log.info("JWT 토큰이 만료되었습니다.");
             throw e;
@@ -78,17 +76,15 @@ public class JwtUtil {
         }
     }
 
-    // JWT 에서 provider 추출
     public String extractProvider(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("provider", String.class);
+            .setSigningKey(secretKey)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("provider", String.class);
     }
 
-    // 토큰 유효성 검사
     public boolean isTokenValid(String token) {
         try {
             if (token != null && token.startsWith("Bearer ")) {
@@ -96,9 +92,9 @@ public class JwtUtil {
             }
 
             Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token);
 
             return true;
         } catch (ExpiredJwtException e) {
@@ -111,7 +107,6 @@ public class JwtUtil {
         return false;
     }
 
-    // 토큰 만료 여부
     public boolean isTokenExpired(String token) {
         try {
             if (token != null && token.startsWith("Bearer ")) {
@@ -119,16 +114,16 @@ public class JwtUtil {
             }
 
             Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
             return claims.getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
-            return true; // 명확히 만료됨
+            return true;
         } catch (Exception e) {
-            return false; // 유효하지 않거나 다른 이유 → 여기선 false로 처리 (상황에 따라 바꿀 수 있음)
+            return false;
         }
     }
 }

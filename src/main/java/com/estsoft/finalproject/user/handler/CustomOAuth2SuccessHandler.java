@@ -31,15 +31,14 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+        HttpServletResponse response,
+        Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = (String) oAuth2User.getAttributes().get("email");
         String provider = oAuth2User.getAttribute("provider");
 
         String token = jwtUtil.generateToken(email, provider);
 
-        // 쿠키 생성 및 설정
         Cookie cookie = new Cookie("JWT", token);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
@@ -48,13 +47,11 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         log.info("JWT 쿠키 설정 완료");
 
-        // 리프레시 토큰 생성
         String refreshToken = jwtUtil.generateRefreshToken(email, provider);
 
         usersRepository.findByProviderAndEmail(provider, email).ifPresent(user -> {
             user.setRefreshToken(refreshToken);
 
-            // 닉네임이 없으면 자동 생성
             if (user.getNickname() == null || user.getNickname().isBlank()) {
                 String nickname;
                 do {
@@ -76,7 +73,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         log.info("리프레시 쿠키 설정 완료");
 
-        // 로그인 후 리디렉션 -> mainpage 로 이동할 수 있도록
         response.sendRedirect("/home");
     }
 

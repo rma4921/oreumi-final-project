@@ -11,10 +11,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CustomOAuth2FailureHandler implements AuthenticationFailureHandler {
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        AuthenticationException exception) throws IOException {
+        HttpServletResponse response,
+        AuthenticationException exception) throws IOException {
         log.info("OAuth2 로그인 실패 : {}", exception.getMessage());
 
         response.sendRedirect("/login?error=true");

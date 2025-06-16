@@ -10,12 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 class TestableJwtAuthenticationFilter extends JwtAuthenticationFilter {
+
     public TestableJwtAuthenticationFilter(JwtUtil jwtUtil, UsersRepository usersRepository) {
         super(jwtUtil, usersRepository);
     }
 
-    public void testDoFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+    public void testDoFilterInternal(HttpServletRequest request, HttpServletResponse response,
+        FilterChain chain)
+        throws ServletException, IOException {
         doFilterInternal(request, response, chain);
     }
 }

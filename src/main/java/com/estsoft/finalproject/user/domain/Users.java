@@ -19,6 +19,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Setter
 @NoArgsConstructor
 public class Users {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -54,5 +55,9 @@ public class Users {
         this.role = role;
         this.registerDate = LocalDateTime.now();
         this.updatedDate = LocalDateTime.now();
+    }
+
+    public void updateId(Long userId) {
+        this.userId = userId;
     }
 }
