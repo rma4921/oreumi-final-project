@@ -1,9 +1,10 @@
 package com.estsoft.finalproject.comment.controller;
 
+import com.estsoft.finalproject.Post.domain.ScrapPost;
+import com.estsoft.finalproject.Post.repository.ScrapPostRepository;
 import com.estsoft.finalproject.comment.dto.CommentRequest;
 import com.estsoft.finalproject.comment.dto.CommentResponse;
-import com.estsoft.finalproject.comment.entity.Comment;
-import com.estsoft.finalproject.comment.repository.CommentRepository;
+import com.estsoft.finalproject.comment.domain.Comment;
 import com.estsoft.finalproject.comment.service.CommentService;
 import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import com.estsoft.finalproject.user.domain.Users;
@@ -20,13 +21,18 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
-    private final CommentRepository commentRepository;
+
+    private final ScrapPostRepository scrapPostRepository;
 
     // 로그인된 사용자 기반 댓글 작성
     @PostMapping
-    public ResponseEntity<CommentResponse> save(@RequestBody CommentRequest request,
-                                                @AuthenticationPrincipal CustomUsersDetails userDetails) {
-        Users user = userDetails.getUsers();
+    public ResponseEntity<?> save(@RequestBody CommentRequest request,
+                                       @AuthenticationPrincipal CustomUsersDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("비회원은 댓글을 달 수 없습니다.");
+        }
+       
+       Users user = userDetails.getUsers();
         Comment comment = commentService.save(request, user);
         return ResponseEntity.ok(new CommentResponse(comment));
     }
@@ -34,7 +40,10 @@ public class CommentController {
     // 게시글 별 댓글 조회
     @GetMapping("/post/{postId}")
     public ResponseEntity<List<CommentResponse>> findByPostId(@PathVariable Long postId) {
-        List<Comment> comments = commentService.findByPostId(postId);
+        ScrapPost scrapPost = scrapPostRepository.findById(postId)
+            .orElseThrow(() -> new IllegalArgumentException("postID가 존재하지 않습니다."));
+
+        List<Comment> comments = commentService.findByPostId(scrapPost);
         List<CommentResponse> response = comments.stream()
                 .map(CommentResponse::new)
                 .toList();

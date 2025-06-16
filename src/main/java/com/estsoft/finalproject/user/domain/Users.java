@@ -55,4 +55,8 @@ public class Users {
         this.registerDate = LocalDateTime.now();
         this.updatedDate = LocalDateTime.now();
     }
+
+    public void updateId(Long userId) {
+        this.userId = userId;
+    }
 }

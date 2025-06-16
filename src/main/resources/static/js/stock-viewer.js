@@ -3,7 +3,7 @@ export async function fetchAndDisplayStock(companyName, targetElementId) {
     stockDiv.innerHTML = "<b>불러오는 중입니다. 잠시만 기다려주세요!</b>";
 
     try {
-        const response = await fetch(`/api/stock-price/by-name?name=${encodeURIComponent(companyName)}&count=10`);
+        const response = await fetch(`/api/v1/stock-price/by-name?name=${encodeURIComponent(companyName)}&count=10`);
         const data = await response.json();
 
         if (data && Array.isArray(data.item) && data.item.length > 0) {

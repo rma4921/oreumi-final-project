@@ -1,6 +1,6 @@
 package com.estsoft.finalproject.comment.dto;
 
-import com.estsoft.finalproject.comment.entity.Comment;
+import com.estsoft.finalproject.comment.domain.Comment;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -17,7 +17,7 @@ public class CommentResponse {
 
     public CommentResponse(Comment comment) {
         this.id = comment.getId();
-        this.postId = comment.getPostId();
+        this.postId = comment.getScrapPost().getPostId();
         this.nickname = comment.getUser().getNickname();
         this.content = comment.getContent();
         this.createTime = comment.getCreateTime();

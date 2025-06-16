@@ -38,7 +38,7 @@ public class WebSearchService {
         NAVER_API_SECRET = apiSecret;
     }
     
-    public ResponseDto<List<NewsSearchItem>> getSearchResults(String query, int numOfItems) {
+    public ResponseDto<List<NewsSearchItem>> getSearchResults(String query, int numOfItems, boolean naverOnly) {
         String query_encoded = "";
         List<NewsSearchItem> retList = new ArrayList<>();
         try {
@@ -60,7 +60,11 @@ public class WebSearchService {
                     .summary(Optional.ofNullable(x.get("description")).map(JsonNode::asText).orElse("Description node in search result is NULL"))
                     .timestamp(Optional.ofNullable(x.get("pubDate")).map(pubDate -> LocalDateTime.parse(pubDate.asText(), DateTimeFormatter.RFC_1123_DATE_TIME)).orElse(LocalDateTime.now()))
                     .build();
-                if (currDto.refLink().contains("news.naver.com")) {
+                if (naverOnly) {
+                    if (currDto.refLink().contains("news.naver.com")) {
+                        retList.add(currDto);
+                    }
+                } else {
                     retList.add(currDto);
                 }
             });
@@ -109,10 +113,10 @@ public class WebSearchService {
                 .retrieve();
             String r = res.body(String.class);
             StringBuilder retBuilder = new StringBuilder();
-            if (!r.contains("data-modify-date-time=\"")) {
+            if (!r.contains("data-date-time=\"")) {
                 return ResponseDto.builder(errorItem).message("News article's time data is not valid (no time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-            String[] dateTimeSplit = r.split("data-modify-date-time=\"");
+            String[] dateTimeSplit = r.split("data-date-time=\"");
             if (dateTimeSplit.length < 2) {
                 return ResponseDto.builder(errorItem).message("News article's time data is not valid (nothing after time delimiter)").responseCode(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }

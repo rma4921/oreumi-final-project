@@ -1,22 +1,22 @@
 package com.estsoft.finalproject.content.services;
 
 import java.util.List;
+import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.estsoft.finalproject.content.model.dto.AlanResponseDto;
+import com.estsoft.finalproject.content.model.dto.ResponseDto;
 import com.estsoft.finalproject.content.prompting.SimpleAlanKoreanPromptBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
-@ActiveProfiles("test")
 public class AlanCommunicationServiceTest {
     @Autowired
     private AlanCommunicationService alanCommunicationService;
@@ -60,19 +60,15 @@ public class AlanCommunicationServiceTest {
     @Test
     void testFindRelatedStock() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testFindRelatedStock()");
-        AlanResponseDto res = alanCommunicationService.findRelatedStock("한화에어로스페이스", 3);
+        ResponseDto<Map<String, String>> res = alanCommunicationService.findRelatedStock("https://n.news.naver.com/mnews/article/018/0006034594?sid=101", true);
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
-        Assertions.assertThat(res.getContent()).isNotEmpty();
-        logger.info("Question is: " + res.getQuestion());
-        logger.info("Result is: " + res.getContent());
-        logger.info("Status is: " + res.getResponseCode());
-        logger.info("Time is: " + res.getTimestamp());
+        res.getItem().forEach((x, y) -> logger.info("Company Name: " + x + " Investment Tip: " + y));
     }
 
     @Test
     public void testSummarizeArticle() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSummarizeArticle()");
-        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://n.news.naver.com/mnews/article/008/0005205597?sid=101");
+        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://n.news.naver.com/mnews/article/018/0006034594?sid=101");
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(res.getContent()).isNotEmpty();
         logger.info("Question is: " + res.getQuestion());
@@ -84,7 +80,7 @@ public class AlanCommunicationServiceTest {
     @Test
     public void testGetContentsForAPage() throws Exception {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testGetContentsForAPage()");
-        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://www.donga.com/news/Politics/article/all/20250526/131671484/2");
+        AlanResponseDto res = alanCommunicationService.summarizeArticle("https://n.news.naver.com/mnews/article/018/0006034594?sid=101");
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         String r = res.getContent();
         Assertions.assertThat(r).isNotEmpty();
@@ -107,7 +103,7 @@ public class AlanCommunicationServiceTest {
         Assertions.assertThat(topic).isNotEmpty();
         Assertions.assertThat(category).isNotEmpty();
         Assertions.assertThat(companies.isArray()).isTrue();
-        companies.forEach(x -> company_list.append("[ Company Name: " + x.get("company_name").asText() + " ISIN: " + x.get("isin_code").asText() + " Corporate Number: " + x.get("corporate_number").asText() + " ]"));
+        companies.forEach(x -> company_list.append("[ Company Name: " + x.get("company_name").asText() + " ]"));
         logger.info("Headline is: " + headline);
         logger.info("Summary is: " + content);
         logger.info("Topic is: " + topic);
@@ -118,7 +114,7 @@ public class AlanCommunicationServiceTest {
     public void testSimpleAlanPromptBuilder() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilder()");
         AlanResponseDto res = alanCommunicationService.getResultFromAlan(SimpleAlanKoreanPromptBuilder.start().
-            addCommand("다음 기사 요약해줘: https://www.donga.com/news/Politics/article/all/20250526/131671484/2")
+            addCommand("다음 기사 요약해줘: https://n.news.naver.com/mnews/article/018/0006034594?sid=101")
             .setOutputFormat("{ \"title\" : (기사 제목), \"summary\" : (요약문) }")
             .addErrorHandler("다음과 같이 결과를 출력해줘: { \"title\" : \"오류\", \"summary\" : (오류 발생 이유) }")
             .buildPrompt());
@@ -128,7 +124,7 @@ public class AlanCommunicationServiceTest {
 
     @Test
     public void testSimpleAlanPromptBuilderWithContext() {
-        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilder()");
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilderWithContext()");
         AlanResponseDto res = alanCommunicationService.getResultFromAlan(SimpleAlanKoreanPromptBuilder.start()
             .addCommand("맛집 5곳 추천해줘")
             .addContext("수원시 인계동에 있는 곳. 종류는 한식으로.")
@@ -150,13 +146,19 @@ public class AlanCommunicationServiceTest {
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         logger.info("Response is: " + res.getContent());
         ObjectMapper mapper = new ObjectMapper();
-        String errorTitle = mapper.readTree(res.getContent()).get("title").asText();
+        String r = res.getContent();
+        if (!r.startsWith("{") || !r.endsWith("}")) {
+            int startJson = r.indexOf('{');
+            int endJson = r.lastIndexOf('}');
+            r = r.substring(startJson, endJson + 1);
+        }
+        String errorTitle = mapper.readTree(r).get("title").asText();
         Assertions.assertThat(errorTitle).isEqualTo("오류");
     }
 
     @Test
     public void testGetTopic() throws JsonProcessingException {
-        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testSimpleAlanPromptBuilder()");
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testGetTopic()");
         AlanResponseDto res1 = alanCommunicationService.sortTopic("https://www.donga.com/news/Politics/article/all/20250526/131671484/2");
         AlanResponseDto res2 = alanCommunicationService.sortTopic("https://n.news.naver.com/mnews/article/215/0001210190");
         Assertions.assertThat(res1.getResponseCode()).isEqualTo(HttpStatus.OK);
