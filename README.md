@@ -30,7 +30,7 @@
 
 <br>
 
-## 4. 기술 스택
+## 4. 기술 스택 
 <br>
 
 | 영역 | 기술 |
@@ -55,7 +55,7 @@
 **소통 게시판** <br>
 **메인 페이지** <br>
 **뉴스 상세 게시글** <br>
-**댓글** <br>
+**댓글**
 
 <br>
 
@@ -63,7 +63,7 @@
 <br>
 
 <details>
-<summary>소셜 로그인 / 로그아웃 (OAuth2 + JWT 인증)</summary><br>
+<summary>🔑 소셜 로그인 / 로그아웃 (OAuth2 + JWT 인증)</summary><br>
 
 - **OAuth2** 기반의 소셜 로그인 구현
   - 로그인 시 Google, Kakao, Naver OAuth2 인증 제공
@@ -82,7 +82,6 @@
 
 <details>
 <summary>메인페이지</summary><br>
-
 
 - **최신 뉴스 기사 호출**
   - 네이버 뉴스 API를 통한 최신 뉴스 기사 제공
@@ -134,25 +133,26 @@
 
 ```
 📁 ToBriefing/
-├── main
-├── category
-├── comment
-├── config
-├── content
-      ├── mypage
-      ├── Post
-      └── user
-└── test
-      ├── category
-      ├── comment
-      ├── content.services
-      ├── Post
-      └── userTest
+        ├── main
+              ├── category
+              ├── comment
+              ├── config
+              ├── content
+              ├── mypage
+              ├── Post
+              └── user
+        └── test
+              ├── category
+              ├── comment
+              ├── content.services
+              ├── Post
+              └── userTest
 ```
+
 
 <br>
 
-## 8. 기능 명세</summary><br>
+## 8. 기능 명세</summary><br> 
 
 <details>
 <summary>로그인 페이지</summary><br>  
@@ -191,10 +191,10 @@
 </details>
 
 <details>
+<summary>소통 게시판(ScrapPost)</summary><br>
 
 | **메뉴** | **기능** | **기능 설명** |
 | --- | --- | --- |
-<summary>소통 게시판(ScrapPost)</summary><br>
 | 목록 조회 | 사용자가 공유한 모든 기사 확인 | 사용자가 공유한 모든 기사 목록 페이지 단위로 조회 |
 
 </details>
@@ -241,9 +241,14 @@
 ### Content
 | NAME | METHOD | URL | DESCRIPTION |
 | --- | --- | --- | --- |
-| | GET | /api/v1/briefing/latest | 최신 기사 가져오기 |
-| | GET | /api/v1/briefing/detail?news-url={} | 특정 기사에 대한 본문 정보 제공 |
-| | GET | /api/v1/briefing/ai_detail | 특ㅓㅇ |
+| latestNewsItem | GET | /api/v1/briefing/latest | 최신 기사 가져오기 |
+| getBriefingInfo | GET | /api/v1/briefing/detail?news-url={} | 네이버 뉴스 기사에 대한 정보를 가져옵니다. AI와 상호작용을 하지 않아, 대기 없이 결과를 바로 가져옵니다. |
+| getDetailedInfo | GET | /api/v1/briefing/ai_detail?news-url={} | 네이버 뉴스 기사에 대한 AI 요약과 관련 주식 종목들을 조회합니다. |
+| getSummaryOnly | GET | /api/v1/briefing/ai_summary?news-url={} | 네이버 뉴스 기사에 대한 AI 요약만을 제공합니다. |
+| getInvestmentRecommendation | GET | /api/v1/briefing/recommendation?company-name={} | 특정 회사에 대해 AI의 추천 정보를 제공합니다. 추천 시에는 해당 회사와 관련된 최근 기사들과, 지난 30일간의 주가를 토대로 조언을 제공합니다. company-name에 대입되는 회사명은 반드시 증시에 상장된 공식 명칭이어야 합니다. |
+| getStockItemsByName | GET | /api/v1/stock-price/by-name?name={회사명}&count={N}| 특정 회사에 대한 지난 N일간의 주가 정보를 가져옵니다. name에 대입되는 회사명은 반드시 증시에 상장된 공식 명칭이어야 합니다. |
+| getStockItemsByIsin | GET | /api/v1/stock-price/by-isin?isin={회사명}&count={N}| 특정 회사에 대한 지난 N일간의 주가 정보를 가져옵니다. 해당 회사의 ISIN 코드를 통해 조회합니다 |
+| saveScrapPost | POST | /api/scrap | 기사 스크랩. |
 
 
 <br>
