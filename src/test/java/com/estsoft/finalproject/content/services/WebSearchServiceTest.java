@@ -7,14 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.estsoft.finalproject.content.model.dto.NewsBriefingItem;
 import com.estsoft.finalproject.content.model.dto.NewsSearchItem;
 import com.estsoft.finalproject.content.model.dto.ResponseDto;
 
 @SpringBootTest
-@ActiveProfiles("test")
 public class WebSearchServiceTest {
     @Autowired
     WebSearchService webSearchService;
