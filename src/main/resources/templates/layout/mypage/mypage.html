@@ -71,7 +71,7 @@
     <h3 class="section-title">작성한 댓글</h3>
     <div th:each="c : ${comments}">
         <div class="comment-item">
-            <div><strong>게시글:</strong> <a th:href="@{/post/{id}(id=${c.postId})}"
+            <div><strong>게시글:</strong> <a th:href="@{/posts/{id}(id=${c.postId})}"
                                           th:text="${c.articleTitle}"></a></div>
             <div><strong>작성한 댓글:</strong> <span th:text="${c.content}"></span></div>
             <div><strong>작성일:</strong> <span
