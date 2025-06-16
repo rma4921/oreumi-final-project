@@ -26,6 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class LogoutTest {
+
     @Mock
     private JwtUtil jwtUtil;
 
@@ -56,7 +57,6 @@ public class LogoutTest {
 
     @Test
     void 로그아웃_요청_시_JWT_REFRESH_쿠키_삭제() throws Exception {
-        // given
         when(authentication.getPrincipal()).thenReturn(customUsersDetails);
         Users users = new Users();
         users.setEmail("test@test.com");
@@ -64,10 +64,8 @@ public class LogoutTest {
 
         when(customUsersDetails.getUsers()).thenReturn(users);
 
-        // when
         logoutSuccessHandler.onLogoutSuccess(request, response, authentication);
 
-        // then
         verify(response, times(2)).addCookie(cookieCaptor.capture());
         assertThat(cookieCaptor.getAllValues()).anySatisfy(cookie -> {
             assertThat(cookie.getName()).isIn("JWT", "REFRESH");
@@ -78,7 +76,6 @@ public class LogoutTest {
 
     @Test
     void 로그아웃_시_DB에_저장_된_REFRESH_삭제() throws Exception {
-        // given
         Users user = new Users();
         user.setEmail("test@test.com");
         user.setRefreshToken("refresh");
@@ -86,10 +83,8 @@ public class LogoutTest {
         when(authentication.getPrincipal()).thenReturn(customUsersDetails);
         when(customUsersDetails.getUsers()).thenReturn(user);
 
-        // when
         logoutSuccessHandler.onLogoutSuccess(request, response, authentication);
 
-        // then
         assertThat(user.getRefreshToken()).isNull();
         verify(usersRepository).save(user);
     }

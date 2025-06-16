@@ -11,3 +11,53 @@ CREATE TABLE users (
     register_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE scrapped_article (
+    scrap_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    scrap_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    title VARCHAR(300),
+    link VARCHAR(300),
+    description TEXT,
+    pub_date TIMESTAMP,
+    topic VARCHAR(100) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE related_stock (
+	related_stock_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    scrap_id BIGINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (scrap_id) REFERENCES scrapped_article(scrap_id) ON DELETE CASCADE
+);
+
+CREATE TABLE news_category (
+	category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(10) NOT NULL UNIQUE
+);
+
+CREATE TABLE scrapped_article_category (
+	scrapped_article_category_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    scrap_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    FOREIGN KEY (scrap_id) REFERENCES scrapped_article(scrap_id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES news_category(category_id) ON DELETE CASCADE
+);
+
+CREATE TABLE scrap_post (
+    post_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    scrap_id BIGINT NOT NULL,
+    post_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (scrap_id) REFERENCES scrapped_article(scrap_id) ON DELETE CASCADE
+);
+
+CREATE TABLE comment (
+	comment_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    content TEXT NOT NULL,
+    comment_date TIMESTAMP NOT NULL,
+    updated_date TIMESTAMP,
+    user_id BIGINT NOT NULL,
+    post_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES scrap_post(post_id) ON DELETE CASCADE
+);

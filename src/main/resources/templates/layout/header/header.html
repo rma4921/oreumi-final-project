@@ -1,0 +1,28 @@
+<div th:fragment="headerFragment">
+    <link rel="stylesheet" href="/css/header/header.css">
+
+    <div class="header-box">
+        <div class="header-inner">
+
+            <div class="header-left">
+                <div class="site-title">
+                    투브리핑
+                </div>
+                <a href="/home" class="nav-link">뉴스 찾아보기</a>
+                <a href="/post" class="nav-link">소통 게시판</a>
+                <a href="/mypage" class="nav-link">마이페이지</a>
+            </div>
+
+            <div class="header-right">
+                <div th:if="${#authentication.principal == 'anonymousUser'}" class="auth-box">
+                    <a href="/login" class="auth-link">로그인</a>
+                </div>
+                <div th:if="${#authentication.principal != 'anonymousUser'}" class="auth-box">
+                    <span class="user-nickname" th:text="${nickname}">닉네임</span>
+                    <a href="/logout" class="auth-link">로그아웃</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

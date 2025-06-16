@@ -1,0 +1,14 @@
+.custom-submit-btn {
+    background-color: #DCFDC7;
+    color: #000;
+    border: none;
+}
+
+.comment-input {
+    resize: none;
+    min-height: 80px;
+}
+
+.comment-list li {
+    margin-bottom: 1rem;
+}

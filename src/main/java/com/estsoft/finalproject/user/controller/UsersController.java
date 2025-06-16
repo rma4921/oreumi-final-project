@@ -3,6 +3,8 @@ package com.estsoft.finalproject.user.controller;
 import com.estsoft.finalproject.user.domain.Users;
 import com.estsoft.finalproject.user.dto.CustomUsersDetails;
 import com.estsoft.finalproject.user.dto.UsersResponse;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +18,13 @@ import com.estsoft.finalproject.user.repository.UsersRepository;
 @RestController
 @RequiredArgsConstructor
 public class UsersController {
+
     private final UsersRepository usersRepository;
 
     @GetMapping("/api/users")
     public ResponseEntity<UsersResponse> getUserInfo(Authentication authentication) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUsersDetails)) {
+        if (authentication == null
+            || !(authentication.getPrincipal() instanceof CustomUsersDetails)) {
             log.info("인증되지 않은 사용자 접근 시도: authentication = {}", authentication);
             return ResponseEntity.status(401).build();
         }
@@ -28,12 +32,25 @@ public class UsersController {
         CustomUsersDetails userDetails = (CustomUsersDetails) authentication.getPrincipal();
 
         Users users = usersRepository.findByProviderAndEmail(
-                        userDetails.getUsers().getProvider(),
-                        userDetails.getUsername())
-                .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+                userDetails.getUsers().getProvider(),
+                userDetails.getUsername())
+            .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-        log.info("인증된 사용자 정보 조회 성공: 이메일 = {}, 프로바이더 = {}", userDetails.getUsername(), userDetails.getUsers().getProvider());
+        log.info("인증된 사용자 정보 조회 성공: 이메일 = {}, 프로바이더 = {}", userDetails.getUsername(),
+            userDetails.getUsers().getProvider());
 
         return ResponseEntity.ok(new UsersResponse(users));
+    }
+
+    @GetMapping("/api/user/status")
+    public ResponseEntity<Map<String, Object>> getLoginStatus(Authentication authentication) {
+        Map<String, Object> result = new HashMap<>();
+        if (authentication != null && authentication.isAuthenticated()) {
+            result.put("loggedIn", true);
+            result.put("username", authentication.getName());
+        } else {
+            result.put("loggedIn", false);
+        }
+        return ResponseEntity.ok(result);
     }
 }

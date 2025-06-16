@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UsersService {
+
     private final UsersRepository usersRepository;
 
     public UsersService(UsersRepository usersRepository) {
@@ -18,7 +19,7 @@ public class UsersService {
 
     public String getOrCreateNickname(String provider, String email) {
         Users users = usersRepository.findByProviderAndEmail(provider, email)
-                .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+            .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
         if (users.getNickname() == null || users.getNickname().isBlank()) {
             String randomStr = UUID.randomUUID().toString().substring(0, 8);
