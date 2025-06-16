@@ -63,7 +63,7 @@
 <br>
 
 <details>
-<summary>🔑 소셜 로그인 / 로그아웃 (OAuth2 + JWT 인증)</summary><br>
+<summary>소셜 로그인 / 로그아웃 (OAuth2 + JWT 인증)</summary><br>
 
 - **OAuth2** 기반의 소셜 로그인 구현
   - 로그인 시 Google, Kakao, Naver OAuth2 인증 제공
@@ -132,6 +132,7 @@
 ## 7. 프로젝트 구조
 <br>
 
+```
 📁 ToBriefing/
 ├── main
 ├── category
@@ -147,7 +148,7 @@
       ├── content.services
       ├── Post
       └── userTest
-
+```
 
 <br>
 
@@ -211,6 +212,8 @@
 
 ### Comment
 
+| NAME | METHOD | URL | DESCRIPTION |
+| --- | --- | --- | --- |
 | saveComment | POST | /api/comments | 댓글 작성 ( 로그인 사용자만 가능) |
 | getCommentsByPostId | GET | /api/comments/post/{postId} | 특정 게시글의 댓글 목록 조회 |
 | updateComment | PUT | /api/comments/{commentId} | 댓글 수정(작성자 본인만 가능) |
@@ -218,18 +221,26 @@
 | getCommentsByUserId | GET | /api/comments/user/{userId} | 특정 유저가 작성한 목록 조회 |
 
 ### Category
+| NAME | METHOD | URL | DESCRIPTION |
+| --- | --- | --- | --- |
 | updateTags | POST | api/mypage/{scrapId}/categories| 카테고리 업데이트 |
 
 ### MyPage
+| NAME | METHOD | URL | DESCRIPTION |
+| --- | --- | --- | --- |
 | getScrappedArticles | GET | /mypage | 마이페이지 목록 조회 |
 | getScrappedArticleDetail | GET | /mypage/scrap/{scrapId} | 마이페이지 상세 게시글 조회|
 | deleteScrappedArticle | DELETE| /api/mypage/{scrapId} | 마이페이지 상세 게시글 삭제 |
 
 ### Community Post
+| NAME | METHOD | URL | DESCRIPTION |
+| --- | --- | --- | --- |
 | saveScrapPost | POST | /post | 공유한 스크랩 기사 저장하기. |
 | getScrapPosts | GET | /post | 공유한 스크랩 기사 목록 조회. |
 
 ### Content
+| NAME | METHOD | URL | DESCRIPTION |
+| --- | --- | --- | --- |
 | | GET | /api/v1/briefing/latest | 최신 기사 가져오기 |
 | | GET | /api/v1/briefing/detail?news-url={} | 특정 기사에 대한 본문 정보 제공 |
 | | GET | /api/v1/briefing/ai_detail | 특ㅓㅇ |
