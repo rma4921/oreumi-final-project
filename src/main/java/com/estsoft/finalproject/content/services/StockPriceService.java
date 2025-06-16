@@ -24,9 +24,9 @@ public class StockPriceService {
     private final String API_KEY;
     private final String STOCK_API_URL = "https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo";
 
-    public StockPriceService(@Value("${kr.gov.data.api-key}") String apiKey) {
+    public StockPriceService(RestClient restClient, @Value("${kr.gov.data.api-key}") String apiKey) {
+        this.restClient = restClient;
         this.API_KEY = apiKey;
-        this.restClient = RestClient.create();
     }
 
     public ResponseDto<List<StockItem>> getStockPriceByName(String stockName, int no) {

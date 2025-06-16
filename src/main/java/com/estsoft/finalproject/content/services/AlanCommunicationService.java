@@ -39,10 +39,10 @@ public class AlanCommunicationService {
     private final String ALAN_API_KEY;
     org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("AlanCommunicationService");
 
-    public AlanCommunicationService(@Value("${ai.est.alan.client-id}") String apiKey,
-        StockPriceService stockPriceService /* ,ViewedNewsItemRepository viewedNewsItemRepository */) {
-        this.restClient = RestClient.create();
-        ALAN_API_KEY = apiKey;
+    public AlanCommunicationService(@Value("${ai.est.alan.client-id:dummy-api-key}") String apiKey,
+                                    RestClient restClient) {
+        this.restClient = restClient;
+        this.ALAN_API_KEY = apiKey;
     }
 
     public AlanResponseDto getResultFromAlan(String question) {

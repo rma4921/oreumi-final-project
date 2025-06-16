@@ -34,10 +34,11 @@ public class WebSearchService {
     private final RestClient restClient;
 
     public WebSearchService(@Value("${com.naver.search.api-key}") String apiKey,
-        @Value("${com.naver.search.api-secret}") String apiSecret) {
-        this.restClient = RestClient.create();
-        NAVER_API_KEY = apiKey;
-        NAVER_API_SECRET = apiSecret;
+                            @Value("${com.naver.search.api-secret}") String apiSecret,
+                            RestClient restClient) {
+        this.NAVER_API_KEY = apiKey;
+        this.NAVER_API_SECRET = apiSecret;
+        this.restClient = restClient;
     }
 
     public ResponseDto<List<NewsSearchItem>> getSearchResults(String query, int numOfItems,
