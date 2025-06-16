@@ -45,11 +45,12 @@ public class TotalTest {
         usersRepository.save(user);
 
         accessToken = jwtUtil.generateToken(user.getEmail(), user.getProvider());
-        refreshToken = jwtUtil.generateToken(user.getEmail(), user.getProvider());
+        refreshToken = jwtUtil.generateRefreshToken(user.getEmail(), user.getProvider());
 
         user.setRefreshToken(refreshToken);
         usersRepository.save(user);
     }
+
 
     @Test
     void 토큰_갱신_요청_시_정상_응답_확인() throws Exception {
