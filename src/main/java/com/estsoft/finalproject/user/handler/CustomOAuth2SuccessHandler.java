@@ -77,7 +77,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         log.info("리프레시 쿠키 설정 완료");
 
         // 로그인 후 리디렉션 -> mainpage 로 이동할 수 있도록
-        response.sendRedirect("/loginSuccessTest");
+        response.sendRedirect("/home");
     }
 
     private String generateRandomNickname() {

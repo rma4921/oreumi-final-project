@@ -1,0 +1,54 @@
+name: CI/CD Deploy to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Transfer jar and properties file to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          source: "build/libs/*.jar"
+          target: "/home/ec2-user/action"
+
+      - name: Upload application.properties to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            echo "${{ secrets.PROPERTIES_SECRET }}" > /home/ec2-user/config/application.properties
+            chmod 600 /home/ec2-user/config/application.properties
+
+      - name: Run deploy script on EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            chmod +x /home/ec2-user/action/scripts/deploy.sh
+            /home/ec2-user/action/scripts/deploy.sh
