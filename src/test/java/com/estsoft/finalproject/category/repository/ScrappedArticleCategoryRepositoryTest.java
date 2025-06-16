@@ -19,7 +19,6 @@
 //import org.springframework.test.context.TestPropertySource;
 //
 //@DataJpaTest
-//@TestPropertySource(locations = "classpath:application-test.properties")
 //class ScrappedArticleCategoryRepositoryTest {
 //
 //    @Autowired

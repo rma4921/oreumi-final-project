@@ -15,7 +15,6 @@
 //
 //@SpringBootTest
 //@AutoConfigureMockMvc
-//@TestPropertySource(locations = "classpath:application-test.properties")
 //class CategoryInitTest {
 //
 //    @Autowired
