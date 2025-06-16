@@ -85,7 +85,7 @@ public class TotalTest {
                                 new Cookie("REFRESH", refreshToken)
                         ))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login?logout"))
+                .andExpect(redirectedUrl("/home"))
                 .andExpect(cookie().maxAge("JWT", 0))
                 .andExpect(cookie().maxAge("REFRESH", 0));
 
