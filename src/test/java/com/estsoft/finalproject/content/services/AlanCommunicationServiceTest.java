@@ -140,7 +140,7 @@ public class AlanCommunicationServiceTest {
     @Test
     public void testSimpleAlanPromptBuilderWithContext() {
         org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(
-            "testSimpleAlanPromptBuilder()");
+            "testSimpleAlanPromptBuilderWithContext()");
         AlanResponseDto res = alanCommunicationService.getResultFromAlan(
             SimpleAlanKoreanPromptBuilder.start()
                 .addCommand("맛집 5곳 추천해줘")
@@ -168,14 +168,19 @@ public class AlanCommunicationServiceTest {
         Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
         logger.info("Response is: " + res.getContent());
         ObjectMapper mapper = new ObjectMapper();
-        String errorTitle = mapper.readTree(res.getContent()).get("title").asText();
+        String r = res.getContent();
+        if (!r.startsWith("{") || !r.endsWith("}")) {
+            int startJson = r.indexOf('{');
+            int endJson = r.lastIndexOf('}');
+            r = r.substring(startJson, endJson + 1);
+        }
+        String errorTitle = mapper.readTree(r).get("title").asText();
         Assertions.assertThat(errorTitle).isEqualTo("오류");
     }
 
     @Test
     public void testGetTopic() throws JsonProcessingException {
-        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(
-            "testSimpleAlanPromptBuilder()");
+        org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("testGetTopic()");
         AlanResponseDto res1 = alanCommunicationService.sortTopic(
             "https://www.donga.com/news/Politics/article/all/20250526/131671484/2");
         AlanResponseDto res2 = alanCommunicationService.sortTopic(

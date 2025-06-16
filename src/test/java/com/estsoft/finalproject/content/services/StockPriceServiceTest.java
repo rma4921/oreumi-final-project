@@ -2,9 +2,11 @@ package com.estsoft.finalproject.content.services;
 
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import com.estsoft.finalproject.content.model.dto.ResponseDto;
 import com.estsoft.finalproject.content.model.dto.StockItem;
@@ -23,6 +25,7 @@ public class StockPriceServiceTest {
             "Name: " + x.name() + " Price: " + String.valueOf(x.price()) + "ISIN: " + x.isin()
                 + " Date: " + x.baseDate()));
         logger.info(res.getMessage());
+        Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
@@ -33,5 +36,6 @@ public class StockPriceServiceTest {
             "Name: " + x.name() + " Price: " + String.valueOf(x.price()) + "ISIN: " + x.isin()
                 + " Date: " + x.baseDate()));
         logger.info(res.getMessage());
+        Assertions.assertThat(res.getResponseCode()).isEqualTo(HttpStatus.OK);
     }
 }
