@@ -80,10 +80,7 @@ public class ScrappedArticleService {
     }
 
     public void deleteScrappedArticle(Long scrapId) {
-        ScrappedArticle article = scrappedArticleRepository.findById(scrapId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 스크랩 기사가 존재하지 않습니다."));
-
-        scrappedArticleRepository.delete(article);
+        scrappedArticleRepository.deleteById(scrapId);
     }
 
     public ResponseDto<ScrappedArticleResponseDto> scrapAnArticle(String scrapData,
