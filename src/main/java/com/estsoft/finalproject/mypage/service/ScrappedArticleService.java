@@ -113,8 +113,8 @@ public class ScrappedArticleService {
                 .topic(topic)
                 .link(link)
                 .scrapDate(LocalDateTime.now()).pubDate(LocalDateTime.now()).user(user).build());
-            companies.ifPresent(x -> relatedStockRepository.save(RelatedStock.builder().name(x.asText()).scrappedArticle(scrapped).build()));
-            
+            companies.ifPresent(x -> x.forEach(y -> relatedStockRepository.save(RelatedStock.builder().name(y.asText()).scrappedArticle(scrapped).build())));
+
             ScrappedArticleResponseDto dto = new ScrappedArticleResponseDto(scrapped.getScrapId(), title, topic, scrapped.getScrapDate());
             return ResponseDto.builder(dto).message("Saved").responseCode(HttpStatus.OK).build();
         } catch (JsonProcessingException jex) {
